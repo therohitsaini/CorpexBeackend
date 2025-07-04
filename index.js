@@ -17,8 +17,9 @@ const { adminInfoRoute } = require("./Routes/adminInfoRoute")
 const { serviceCardRoute } = require("./Routes/adminServiceRoute")
 const { funfactRoute } = require("./Routes/adminFunfactRoute")
 const { portfolioSectionRoutes } = require("./Routes/adminPortfolioRoute")
+const { adminPrincingRoute } = require("./Routes/adminPrincingRoute")
+const { testimonialRoute } = require("./Routes/adminTestimonilaRoute")
 app.use(express.json())
-// app.use(express.static("uploads"))
 app.use(express.static(path_.join(__dirname, "uploads")))
 app.use('/uploadsStore', express.static(path_.join(__dirname, 'uploadsStore')));
 
@@ -31,8 +32,10 @@ app.use("/api/info", adminInfoRoute)
 app.use("/admin-api", adminControllerRoute)
 app.use("/admin-api", serviceCardRoute)
 app.use("/admin-hero", heroRoute)
-app.use("/api-funfact",funfactRoute)
-app.use("/api-portfolio",portfolioSectionRoutes)
+app.use("/api-funfact", funfactRoute)
+app.use("/api-portfolio", portfolioSectionRoutes)
+app.use("/api-princing", adminPrincingRoute)
+app.use("/api/testimonial",testimonialRoute)
 
 
 app.listen(PORT, () => {

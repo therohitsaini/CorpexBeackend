@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const noSpecialCharsRegex = /^[a-zA-Z0-9\s\-]+$/;
 
 const headerSchema = new mongoose.Schema({
+
     headerTopBar: [
         {
             section: { type: String, required: true },
@@ -43,6 +44,7 @@ const headerSchema = new mongoose.Schema({
 
         }
     ],
+
     ServiceCard: [
         {
             iconeTop: { type: String },
@@ -59,6 +61,7 @@ const headerSchema = new mongoose.Schema({
 
         }
     ],
+
     portfolioItems: [
         {
             title: {
@@ -80,11 +83,36 @@ const headerSchema = new mongoose.Schema({
                 type: String
             }
         }
+    ],
+
+    PrincingSection: [
+        {
+            heading: { type: String },
+            listItem: { type: [String] },
+            price: { type: String },
+            button: { type: String }
+        }
+    ],
+
+    TestimonialSection: [
+        {
+            heading: { type: String },
+            userName: { type: String },
+            userProfile: { type: String },
+            paragraph: { type: String },
+            occupationRole: { type: String }
+        }
     ]
+
 });
 
 const HeaderData = mongoose.model("userdetails", headerSchema);
 module.exports = { HeaderData };
+
+
+
+
+
 
 
 
