@@ -5,7 +5,7 @@ const { HeaderData } = require("../modelSchema/headerSchema");
 
 
 
-const ServiceCardUpdate = async (request, response) => {    
+const ServiceCardUpdate = async (request, response) => {
     try {
         const { id } = request.params
         const { iconeTop, serviceHeading, ServiceDescription, iconeBottom } = request.body;
@@ -21,7 +21,7 @@ const ServiceCardUpdate = async (request, response) => {
             { new: true }
         );
 
-        response.json(updatedDoc);
+        return response.status(201).send({ message: " Add Card successfully ! " })
     } catch (err) {
         response.status(500).json({ error: err.message });
     }
@@ -53,7 +53,7 @@ const deleteServiceItem = async (req, res) => {
             { $pull: { ServiceCard: { _id: data } } }
         );
 
-        res.status(200).json({ message: "Info item deleted", result });
+        res.status(200).json({ message: "Service item deleted Succesfully !", result });
     } catch (err) {
         console.error("Delete error:", err);
         res.status(500).json({ error: "Server error" });
@@ -62,6 +62,7 @@ const deleteServiceItem = async (req, res) => {
 const getServiceCardByID = async (req, res) => {
     const { parentId, cardId } = req.params;
 
+    
     if (!parentId || !cardId) {
         return res.status(400).json({ message: "Both parentId and cardId are required" });
     }
@@ -103,7 +104,7 @@ const updateServiceIDM = async (request, response) => {
             "ServiceCard.$.serviceHeading": body.serviceHeading,
             "ServiceCard.$.ServiceDescription": body.ServiceDescription,
             "ServiceCard.$.iconeBottom": body.iconeBottom
-            
+
         };
 
         const updatedDoc = await HeaderData.findOneAndUpdate(

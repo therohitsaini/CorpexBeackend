@@ -28,7 +28,7 @@ const funfactUpdate = async (request, response) => {
             { new: true }
         );
 
-        response.json(updatedDoc);
+        return response.status(201).send({ message: "Create Funfact Card Successfully !" })
     } catch (error) {
         console.log(error)
         return response.status(500).send({ message: "Somthing Went Wrong" })
@@ -50,7 +50,7 @@ const deleteFunfactItem = async (req, res) => {
             { $pull: { FunfactBox: { _id: data } } }
         );
 
-        res.status(200).json({ message: "Info item deleted", result });
+        res.status(200).json({ message: " Delete Successfully Funfact Item !", result });
     } catch (err) {
         console.error("Delete error:", err);
         res.status(500).json({ error: "Server error" });
@@ -73,7 +73,7 @@ const updateFunfactID = async (request, response) => {
         const infoObjectId = new mongoose.Types.ObjectId(userDocID);
 
         const updateFields = {
-            
+
             "FunfactBox.$.projectCount": body.projectCount,
             "FunfactBox.$.aboutProject": body.aboutProject,
 
@@ -97,8 +97,8 @@ const updateFunfactID = async (request, response) => {
         }
 
         response.status(200).json({
-            message: "Info section updated successfully",
-            data: updatedDoc
+            message: "Funfact Item updated successfully",
+            // data: updatedDoc
         });
 
     } catch (error) {

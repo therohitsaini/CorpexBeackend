@@ -98,7 +98,7 @@ const deletePortData = async (request, response) => {
         if (!result) {
             return res.status(404).json({ message: 'User not found' });
         }
-        return response.status(200).send({ success: true })
+        return response.status(200).send({ message: "Delete Successfully Portfolio Categories !" })
     } catch (err) {
         response.status(500).json({ error: err.message });
 
@@ -155,7 +155,7 @@ const updatePortfoliorData = async (req, res) => {
         }
 
         res.status(200).json({
-            message: "Hero section updated successfully",
+            message: "Portfolio section updated successfully",
             data: updatedDoc
         });
 

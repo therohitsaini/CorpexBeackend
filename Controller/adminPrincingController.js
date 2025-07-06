@@ -33,7 +33,7 @@ const postPrincingSection = async (request, response) => {
             await existing.save();
 
             return response.status(200).json({
-                message: "New portfolio item added successfully.",
+                message: "New Princing item added successfully.",
                 data: existing
             });
         } else {
@@ -46,7 +46,7 @@ const postPrincingSection = async (request, response) => {
             await newUser.save();
 
             return response.status(201).json({
-                message: "New user document created with portfolio item.",
+                message: "New user document created with Princing item.",
                 data: newUser
             });
         }
@@ -96,7 +96,7 @@ const deletePrincingData = async (request, response) => {
         if (!result) {
             return res.status(404).json({ message: 'User not found' });
         }
-        return response.status(200).send({ success: true })
+        return response.status(200).send({ message: "Delete Princing Itemes !" })
     } catch (err) {
         response.status(500).json({ error: err.message });
 
@@ -226,9 +226,11 @@ const getDataPrincingForUpdate = async (request, response) => {
 
 
 module.exports = {
+
     postPrincingSection,
     getPrincingData,
     deletePrincingData,
     updatePrincingIDM,
     getDataPrincingForUpdate
+    
 };

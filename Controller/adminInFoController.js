@@ -6,7 +6,7 @@ const { HeaderData } = require("../modelSchema/headerSchema");
 const UpdateInFo = async (request, response) => {
     try {
         const { id } = request.params
-       
+
         const { inFoHeading, inFoDescription, inFoIcone, } = request.body;
 
         if (!id) {
@@ -18,7 +18,8 @@ const UpdateInFo = async (request, response) => {
             { new: true }
         );
 
-        response.json(updatedDoc);
+        // response.json(updatedDoc);
+        return response.status(201).send({ message: "New Info Item Add !" })
     } catch (err) {
         response.status(500).json({ error: err.message });
     }
