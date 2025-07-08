@@ -62,7 +62,7 @@ const deleteServiceItem = async (req, res) => {
 const getServiceCardByID = async (req, res) => {
     const { parentId, cardId } = req.params;
 
-    
+
     if (!parentId || !cardId) {
         return res.status(400).json({ message: "Both parentId and cardId are required" });
     }
@@ -125,7 +125,7 @@ const updateServiceIDM = async (request, response) => {
         }
 
         response.status(200).json({
-            message: "Info section updated successfully",
+            message: "Service section updated successfully",
             data: updatedDoc
         });
 

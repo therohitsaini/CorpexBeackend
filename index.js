@@ -19,6 +19,7 @@ const { funfactRoute } = require("./Routes/adminFunfactRoute")
 const { portfolioSectionRoutes } = require("./Routes/adminPortfolioRoute")
 const { adminPrincingRoute } = require("./Routes/adminPrincingRoute")
 const { testimonialRoute } = require("./Routes/adminTestimonilaRoute")
+const { featureRoutes } = require("./Routes/adminFeatureRoute")
 app.use(express.json())
 app.use(express.static(path_.join(__dirname, "uploads")))
 app.use('/uploadsStore', express.static(path_.join(__dirname, 'uploadsStore')));
@@ -36,6 +37,7 @@ app.use("/api-funfact", funfactRoute)
 app.use("/api-portfolio", portfolioSectionRoutes)
 app.use("/api-princing", adminPrincingRoute)
 app.use("/api/testimonial",testimonialRoute)
+app.use("/api-feature",featureRoutes)
 
 
 app.listen(PORT, () => {

@@ -5,8 +5,7 @@ const { ObjectId } = mongoose.Types;
 const postPrincingSection = async (request, response) => {
     const { id } = request.params;
     const body = request.body;
-    console.log(body)
-
+ 
     try {
 
         if (!id || !mongoose.Types.ObjectId.isValid(id)) {
@@ -21,14 +20,13 @@ const postPrincingSection = async (request, response) => {
             button,
             listItem: typeof listItem === 'string' ? JSON.parse(listItem) : listItem || [],
 
-
         };
 
         const existing = await HeaderData.findOne({ _id: id });
 
         if (existing) {
 
-            // existing.portfolioItems.push(newPrincingItem);
+          
             (existing.PrincingSection ??= []).push(newPrincingItem);
             await existing.save();
 

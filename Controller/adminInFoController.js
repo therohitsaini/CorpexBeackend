@@ -72,7 +72,7 @@ const deleteInFoItem = async (req, res) => {
 
 const updateInFoID = async (request, response) => {
     const { userId, userDocID } = request.params;
-    const body = request.body;
+    const body = request.body
 
     if (!userId || !userDocID) {
         return response.status(400).send({ message: "Missing ID or userDocID" });

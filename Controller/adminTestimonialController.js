@@ -1,13 +1,13 @@
 const mongoose = require('mongoose');
 const { HeaderData } = require('../modelSchema/headerSchema');
-const { response } = require('express');
+
+const { ObjectId } = mongoose.Types;
 
 
 const postTestimonialSection = async (request, response) => {
     const { id } = request.params;
     const body = request.body;
-    console.log(body)
-
+  
     try {
 
         if (!id || !mongoose.Types.ObjectId.isValid(id)) {
@@ -17,13 +17,11 @@ const postTestimonialSection = async (request, response) => {
         const { heading, userName, paragraph, occupationRole } = body;
 
         const newTestimonialSection = {
-
             heading,
             userName,
             paragraph,
             occupationRole,
             userProfile: request.file ? `/uploadsStore/${id}/${request.file.filename}` : ""
-
         };
 
         const existing = await HeaderData.findOne({ _id: id });
@@ -188,12 +186,36 @@ const getDataTestimonialForUpdate = async (request, response) => {
     }
 }
 
+const deleteTestimonialData = async (request, response) => {
+    const { data, pageId } = request.body
+
+    try {
+        const result = await HeaderData.findByIdAndUpdate(
+            pageId,
+            {
+                $pull: {
+                    TestimonialSection: { _id: new ObjectId(data) }  //  !important 
+                }
+            },
+        );
+
+        if (!result) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        return response.status(200).send({ message: "Delete Testimonial Itemes !" })
+    } catch (err) {
+        response.status(500).json({ error: err.message });
+
+    }
+}
+
 
 module.exports = {
 
     postTestimonialSection,
     getTestimonial,
     updateTestimonilaData,
-    getDataTestimonialForUpdate
+    getDataTestimonialForUpdate,
+    deleteTestimonialData
 
 }

@@ -8,7 +8,8 @@ const {
     deleteKeyDataByID,
     updateSliderData,
     deleteHeaderSection,
-    logo_
+    logo_,
+    logoUpdate
 
 } = require("../Controller/adminHeaderController")
 const { siteupload, upload } = require("../Middleware/FileStorage")
@@ -21,7 +22,7 @@ adminControllerRoute.get("/get-header-data/:id", getHeaderData)
 adminControllerRoute.put("/hero-section/:id", siteupload.single('heroImg'), // "heroImg" is the field name in your form
     updateHeroSection
 );
-adminControllerRoute.post("/logo/logo/:id", siteupload.single('imageLogo'), logo_)
+adminControllerRoute.post("/logo/logo/:id", siteupload.single('imageLogo'), logoUpdate)
 adminControllerRoute.delete("/delete-dyanamic-data/", deleteKeyDataByID)
 adminControllerRoute.delete("/delete-header/list-item/", deleteHeaderSection)
 

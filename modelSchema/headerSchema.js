@@ -102,6 +102,14 @@ const headerSchema = new mongoose.Schema({
             paragraph: { type: String },
             occupationRole: { type: String }
         }
+    ],
+
+    FeatureSectionStore: [
+        {
+            sectionTitle: { type: String },
+            setionDescriptions: { type: String },
+            setionImage: { type: String },
+        }
     ]
 
 });

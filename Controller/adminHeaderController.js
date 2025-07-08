@@ -2,7 +2,7 @@
 
 const { response } = require("express");
 const { HeaderData } = require("../modelSchema/headerSchema");
-const mongoose = require("mongoose")// or: const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const { ObjectId } = mongoose.Types;
 
 
@@ -11,16 +11,12 @@ const headerIcone_Data_Update = async (req, res) => {
         const { id } = req.params;
         const { section, item } = req.body;
 
-
-
         if (!id || !section || !item) {
             return res.status(400).send({
                 success: false,
                 message: "Missing ID, section, or item"
             });
         }
-
-
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).send({
                 success: false,
@@ -77,7 +73,6 @@ const headerIcone_Data_Update = async (req, res) => {
 };
 
 
-
 const getHeaderData = async (request, response) => {
     try {
         const { id } = request.params
@@ -90,57 +85,55 @@ const getHeaderData = async (request, response) => {
     }
 
 }
-
-const logo_ = async (req, res) => {
-    const { id } = req.params
-    const { section, textLogo } = req.body;
-    let item = [];
+const logoUpdate = async (req,res) => {
+    const { id } = req.params;
+    const { section } = req.body;
+  
+    // if (!file || section !== "Logo") {
+    //     return res.status(400).json({ message: "Invalid request" });
+    // }
 
     try {
-        if (req.body.item) {
-        }
+        const logoUrl = req.file ? `/uploadsStore/${id}/${req.file.filename}` : ""
 
-        if (section === "Logo") {
-            if (req.file) {
-                item = [{
-                    item_Title: "Logo",
-                    item_IconeUrl: `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`
-                }];
-            } else if (textLogo) {
-                item = [{
-                    item_Title: textLogo,
-                    item_IconeUrl: ""
-                }];
-            }
-        }
-
-        let doc = await HeaderData.findOne(id);
+        const doc = await HeaderData.findById(id);
 
         if (!doc) {
+            return res.status(404).json({ message: "Settings document not found" });
+        }
 
-            doc = new HeaderData({
-                id,
-                headerTopBar: [{ section, item }]
-            });
+        const sectionIndex = doc.headerTopBar.findIndex(
+            (entry) => entry.section === "Logo"
+        );
+
+        const logoItem = {
+            item_Title: "Logo",
+            item_IconeUrl: logoUrl
+        };
+
+        if (sectionIndex !== -1) {
+           
+            doc.headerTopBar[sectionIndex].item = [logoItem];
         } else {
-
-            const existingSection = doc.headerTopBar.find(s => s.section === section);
-            if (existingSection) {
-                existingSection.item = item;
-            } else {
-                doc.headerTopBar.push({ section, item });
-            }
+          
+            doc.headerTopBar.push({
+                section: "Logo",
+                item: [logoItem]
+            });
         }
 
         await doc.save();
-        res.status(200).json({ success: true, data: doc });
 
+        res.status(200).json({
+            message: "Logo updated successfully",
+            logoUrl
+        });
     } catch (error) {
-        console.error("Error saving section:", error);
-        res.status(500).json({ success: false, error: error.message });
+        console.error("Error saving logo:", error);
+        res.status(500).json({ message: "Server error" });
     }
-}
 
+}
 
 
 const updateHeroSection = async (req, res) => {
@@ -346,42 +339,20 @@ const deleteHeaderSection = async (request, response) => {
     }
 }
 
-// <--------------------------------- FunFat  Section Apis End ----------------------------->
 
 module.exports = {
     headerIcone_Data_Update,
     getHeaderData,
     updateHeroSection,
-    // getSeriveCardDataID,
     deleteKeyDataByID,
-    // funfactUpdate,
     funfactGetData,
     getHeroSectionDataID,
     updateSliderData,
     deleteHeaderSection,
-    logo_
+    logoUpdate
 }
 
 
 
 
 
-// const deleteHeroSectionById = async (req, res) => {
-//   try {
-//     const { parentId, userSectionId } = req.params;
-
-//     const updatedDoc = await HeaderData.findByIdAndUpdate(
-//       parentId,
-//       { $pull: { HeroSection: { _id: userSectionId } } },
-//       { new: true }
-//     );
-
-//     if (!updatedDoc) {
-//       return res.status(404).json({ success: false, message: 'Document not found' });
-//     }
-
-//     res.status(200).json({ success: true, message: 'Item deleted', data: updatedDoc });
-//   } catch (err) {
-//     res.status(500).json({ success: false, message: err.message });
-//   }
-// };
