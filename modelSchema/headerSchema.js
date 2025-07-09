@@ -110,7 +110,17 @@ const headerSchema = new mongoose.Schema({
             setionDescriptions: { type: String },
             setionImage: { type: String },
         }
+    ],
+    FeatureSectionListItem: [
+        {
+            listTitle: { type: String },
+            listIconeLeft: { type: String },
+            listIconeRight: { type: String },
+            backGroundImage: { type: String },
+        }
     ]
+
+
 
 });
 

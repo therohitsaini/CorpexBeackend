@@ -109,9 +109,6 @@ const deletePortData = async (request, response) => {
 const updatePortfoliorData = async (req, res) => {
     const { userId, userDocID } = req.params;
 
-
-
-
     if (!userId || !userDocID) {
         return res.status(400).send({ message: "Id Not found" })
     }
@@ -119,7 +116,7 @@ const updatePortfoliorData = async (req, res) => {
     try {
         const userObjectId = new mongoose.Types.ObjectId(userId);
         const userDocsObjectId = new mongoose.Types.ObjectId(userDocID);
-        console.log("Request body:", req.body.title);
+       
         const updateFields = {
             "portfolioItems.$.title": req.body.title || "",
             "portfolioItems.$.subTitle": req.body.subTitle || "",
