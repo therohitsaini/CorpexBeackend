@@ -5,7 +5,7 @@ const { ObjectId } = mongoose.Types;
 const postPortfolioSection = async (request, response) => {
     const { id } = request.params;
     const body = request.body;
-    console.log(body)
+  
 
     try {
 

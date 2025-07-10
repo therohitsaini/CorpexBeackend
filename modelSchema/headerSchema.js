@@ -118,6 +118,23 @@ const headerSchema = new mongoose.Schema({
             listIconeRight: { type: String },
             backGroundImage: { type: String },
         }
+    ],
+    TeamHeadingSection: [
+        {
+            teamHeading: { type: String },
+            teamDescription: { type: String },
+            teamBgImage: { type: String },
+
+        }
+    ],
+    TeamCardSection: [
+        {
+            image: { type: String },
+            name: { type: String },
+            role: { type: String },
+            item_Icone: { type: [String] },
+            urls: { type: [String] },
+        }
     ]
 
 
