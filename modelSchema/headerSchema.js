@@ -135,7 +135,28 @@ const headerSchema = new mongoose.Schema({
             item_Icone: { type: [String] },
             urls: { type: [String] },
         }
-    ]
+    ],
+    BlogHeadingSection: [
+        {
+            blogHeading: { type: String },
+            blogDescription: { type: String },
+
+
+        }
+    ],
+    BlogCardSection: [
+        {
+            goIcone: { type: String },
+            blogDatePicker: { type: String },
+            blogerRoleIocne: { type: String },
+            blogerRole: { type: String },
+            blogHeading: { type: String },
+            blogDescription: { type: String },
+            blogButton: { type: String },
+            blogerImage: { type: String },
+
+        }
+    ],
 
 
 

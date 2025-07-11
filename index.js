@@ -21,6 +21,7 @@ const { adminPrincingRoute } = require("./Routes/adminPrincingRoute")
 const { testimonialRoute } = require("./Routes/adminTestimonilaRoute")
 const { featureRoutes } = require("./Routes/adminFeatureRoute")
 const { teamRoute } = require("./Routes/adminTeamRoute")
+const { blogRoute } = require("./Routes/adminBlogRoute")
 app.use(express.json())
 app.use(express.static(path_.join(__dirname, "uploads")))
 app.use('/uploadsStore', express.static(path_.join(__dirname, 'uploadsStore')));
@@ -37,9 +38,10 @@ app.use("/admin-hero", heroRoute)
 app.use("/api-funfact", funfactRoute)
 app.use("/api-portfolio", portfolioSectionRoutes)
 app.use("/api-princing", adminPrincingRoute)
-app.use("/api/testimonial",testimonialRoute)
-app.use("/api-feature",featureRoutes)
-app.use("/api-team",teamRoute)
+app.use("/api/testimonial", testimonialRoute)
+app.use("/api-feature", featureRoutes)
+app.use("/api-team", teamRoute)
+app.use("/api-blog", blogRoute)
 
 
 app.listen(PORT, () => {
