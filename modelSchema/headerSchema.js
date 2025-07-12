@@ -185,3 +185,17 @@ module.exports = { HeaderData };
 //         ]
 //     }
 // ],
+
+
+
+
+    //  "BlogCardSection.$.goIcone": req.body.goIcone || "",
+    //         "BlogCardSection.$.blogDatePicker": req.body.blogDatePicker || "",
+    //         // "BlogCardSection.$.item_ShowOnWebsite": req.body.item_ShowOnWebsite || "",
+    //         // "BlogCardSection.$.categories": req.body.categories || "",
+
+    //         "BlogCardSection.$.blogerRoleIocne": req.body.blogerRoleIocne || "",
+    //         "BlogCardSection.$.blogerRole": req.body.blogerRole || "",
+    //         "BlogCardSection.$.blogHeading": req.body.blogHeading || "",
+    //         "BlogCardSection.$.blogDescription": req.body.blogDescription || "",
+    //         "BlogCardSection.$.blogButton": req.body.blogButton || "",

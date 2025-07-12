@@ -118,7 +118,7 @@ const postBlogInformation = async (request, response) => {
 
         if (exsist) {
 
-            // existing.portfolioItems.push(newPortfolioItem);
+            // existing.BlogCardSection.push(newPortfolioItem);
             (exsist.BlogCardSection ??= []).push(newTeam);
             await exsist.save();
 
@@ -168,10 +168,122 @@ const getBlogData = async (request, response) => {
     }
 }
 
+const deleteBlogData = async (request, response) => {
+    const { data, pageId } = request.body
+
+    try {
+        const result = await HeaderData.findByIdAndUpdate(
+            pageId,
+            {
+                $pull: {
+                    BlogCardSection: { _id: new ObjectId(data) }
+                }
+            },
+        );
+
+        if (!result) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        return response.status(200).send({ message: "Delete Successfully Blog Card Section !" })
+    } catch (err) {
+        response.status(500).json({ error: err.message });
+
+    }
+}
+
+const getBlogDataForUpdate = async (request, response) => {
+    const { id, docsId } = request.params;
+
+    if (!id || !docsId) {
+        return response.status(400).json({ message: "Both parentId and cardId are required" });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(id) || !mongoose.Types.ObjectId.isValid(docsId)) {
+        return response.status(400).json({ message: "Invalid or missing user ID!" });
+    }
+    try {
+        const document = await HeaderData.findById(id).select("BlogCardSection");
+        if (!document) {
+            return response.status(404).json({ message: "Parent document not found" });
+        }
+        const foundCard = document.BlogCardSection.find(item => item._id.toString() === docsId);
+
+        if (!foundCard) {
+            return res.status(404).json({ message: "BlogCardSection item not found" });
+        }
+        return response.status(200).json({ success: true, data: foundCard });
+    } catch (error) {
+        console.error("Fetch error:", error);
+        return response.status(500).json({ error: "Server error" });
+    }
+}
+
+const updateBlogData = async (req, res) => {
+    const { id, userDocID } = req.params;
+
+    if (!id || !userDocID) {
+        return res.status(400).send({ message: "Id Not found" })
+    }
+
+    try {
+        const userObjectId = new mongoose.Types.ObjectId(id);
+        const userDocsObjectId = new mongoose.Types.ObjectId(userDocID);
+
+        const updateFields = {
+
+            "BlogCardSection.$.goIcone": req.body.goIcone || "",
+            "BlogCardSection.$.blogDatePicker": req.body.blogDatePicker || "",
+            "BlogCardSection.$.blogerRoleIocne": req.body.blogerRoleIocne || "",
+            "BlogCardSection.$.blogerRole": req.body.blogerRole || "",
+            "BlogCardSection.$.blogHeading": req.body.blogHeading || "",
+            "BlogCardSection.$.blogDescription": req.body.blogDescription || "",
+            "BlogCardSection.$.blogButton": req.body.blogButton || "",
+
+        };
+
+        if (req.file) {
+            updateFields["BlogCardSection.$.blogerImage"] =
+                `/uploadsStore/${req.params.id}/${req.file.filename}`;
+
+        }
+
+        const updatedDoc = await HeaderData.findOneAndUpdate(
+            {
+                _id: userObjectId,
+                "BlogCardSection._id": userDocsObjectId
+            },
+            {
+                $set: updateFields
+            },
+            {
+                new: true
+            }
+        );
+
+        if (!updatedDoc) {
+            return res.status(404).json({ error: "Hero section item not found" });
+        }
+
+        res.status(200).json({
+            message: "Blog  updated successfully",
+            data: updatedDoc
+        });
+
+    } catch (err) {
+        console.error("Update error:", err);
+        res.status(500).json({ error: "Server error: " + err.message });
+    }
+};
+
 
 module.exports = {
+
     updateAndCreateBlogStore,
     getBlogHeading,
     postBlogInformation,
-    getBlogData
+    getBlogData,
+    deleteBlogData,
+    getBlogDataForUpdate,
+    updateBlogData
+
 }

@@ -8,7 +8,7 @@ const portfolioSectionRoutes = express.Router()
 portfolioSectionRoutes.post("/portfolio/api/:id", siteupload.single('userImage'), postPortfolioSection)
 portfolioSectionRoutes.get("/get-portfolio/:id", getPortfolioPost)
 portfolioSectionRoutes.delete("/delete-portfolio/", deletePortData)
-portfolioSectionRoutes.put("/update-port-folio/:userId/:userDocID", upload.single('userImage'), updatePortfoliorData)
+portfolioSectionRoutes.put("/update-port-folio/:userId/:userDocID/", upload.single('userImage'), updatePortfoliorData)
 
 
 module.exports = {
