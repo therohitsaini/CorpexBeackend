@@ -157,7 +157,95 @@ const headerSchema = new mongoose.Schema({
 
         }
     ],
+    FooterSponese: [
+        {
+            sponsorsOne: { type: String },
+            sponsorsTwo: { type: String },
+            sponsorsThree: { type: String },
+            sponsorsFour: { type: String },
+            sponsorsFive: { type: String },
+            showOnWebsite: { type: Boolean, default: true },
+            userId: { type: mongoose.Schema.Types.ObjectId, ref: 'userdetails' }
+        }
+    ],
 
+    FooterBackground: {
+        backgroundColor: { type: String },
+        backgroundImage: { type: String }
+    },
+
+    FooterTopBar: [
+        {
+            image: { type: String },
+            icon: { type: String },
+            text: { type: String },
+            show: { type: Boolean, default: true }
+        }
+    ],
+
+    FooterHelpCenter: {
+        leftSection: {
+            image: { type: String },
+            title: { type: String, default: "Have a Doubt We Can Help" },
+            subtitle: { type: String, default: "Boot For Consultation" },
+            icon: { type: String, default: "HeadphonesIcon" },
+            show: { type: Boolean, default: true }
+        },
+        rightSection: {
+            image: { type: String },
+            title: { type: String, default: "Cloud Computing Service" },
+            subtitle: { type: String, default: "Ckeck Eligibility" },
+            icon: { type: String, default: "CloudIcon" },
+            show: { type: Boolean, default: true }
+        }
+    },
+
+    FooterContact: [
+        {
+            description: { type: String },
+            logo: { type: String },
+            icons: [
+                {
+                    iconName: { type: String },
+                    icon: { type: String },
+                    iconUrl: { type: String }
+                }
+            ]
+        }
+    ],
+
+    FooterRightContact: [
+        {
+            location: {
+                icon: { type: String },
+                location: { type: String },
+                address: { type: String }
+            },
+            call: {
+                icon: { type: String },
+                call: { type: String },
+                contactNumber: { type: String }
+            },
+            email: {
+                icon: { type: String },
+                email: { type: String },
+                emailId: { type: String }
+            }
+        }
+    ],
+
+    FooterCategory: [
+        {
+            categoryName: { type: String, required: true },
+            listItem: { type: [String], default: [] }
+        }
+    ],
+    FooterTags: [
+        {
+            FooterTagesName: { type: String, required: true },
+            listItem: { type: [String], default: [] }
+        }
+    ]
 
 
 });
@@ -189,13 +277,13 @@ module.exports = { HeaderData };
 
 
 
-    //  "BlogCardSection.$.goIcone": req.body.goIcone || "",
-    //         "BlogCardSection.$.blogDatePicker": req.body.blogDatePicker || "",
-    //         // "BlogCardSection.$.item_ShowOnWebsite": req.body.item_ShowOnWebsite || "",
-    //         // "BlogCardSection.$.categories": req.body.categories || "",
+//  "BlogCardSection.$.goIcone": req.body.goIcone || "",
+//         "BlogCardSection.$.blogDatePicker": req.body.blogDatePicker || "",
+//         // "BlogCardSection.$.item_ShowOnWebsite": req.body.item_ShowOnWebsite || "",
+//         // "BlogCardSection.$.categories": req.body.categories || "",
 
-    //         "BlogCardSection.$.blogerRoleIocne": req.body.blogerRoleIocne || "",
-    //         "BlogCardSection.$.blogerRole": req.body.blogerRole || "",
-    //         "BlogCardSection.$.blogHeading": req.body.blogHeading || "",
-    //         "BlogCardSection.$.blogDescription": req.body.blogDescription || "",
-    //         "BlogCardSection.$.blogButton": req.body.blogButton || "",
+//         "BlogCardSection.$.blogerRoleIocne": req.body.blogerRoleIocne || "",
+//         "BlogCardSection.$.blogerRole": req.body.blogerRole || "",
+//         "BlogCardSection.$.blogHeading": req.body.blogHeading || "",
+//         "BlogCardSection.$.blogDescription": req.body.blogDescription || "",
+//         "BlogCardSection.$.blogButton": req.body.blogButton || "",
