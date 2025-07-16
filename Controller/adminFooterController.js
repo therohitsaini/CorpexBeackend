@@ -947,342 +947,14 @@ const deleteFooterRightContact = async (req, res) => {
     }
 };
 
-// Footer Help Center APIs
-const createFooterHelpCenter = async (req, res) => {
-    try {
-        let userId = req.params.userId;
 
-        // Handle different request formats from frontend
-        if (!userId && req.body.userId) {
-            userId = req.body.userId;
-        }
 
-        // If still no userId, try to get from localStorage equivalent
-        if (!userId) {
-            // Try to get from query params or headers
-            userId = req.query.userId || req.headers['user-id'];
-        }
 
-        // If still no userId, try to get from localStorage (frontend equivalent)
-        if (!userId) {
-            // For the specific endpoint that frontend calls without userId
-            // We'll try to find any existing document or create a new one
-            let footer = await HeaderData.findOne({ FooterHelpCenter: { $exists: true, $ne: null } });
 
-            if (!footer) {
-                // Create a new document if none exists
-                footer = new HeaderData();
-                await footer.save();
-            }
 
-            userId = footer._id;
-        }
 
-        if (!mongoose.Types.ObjectId.isValid(userId)) {
-            return res.status(400).json({
-                message: "Invalid User ID. Please provide userId in params, body, or headers"
-            });
-        }
 
-        const footer = await HeaderData.findById(userId);
 
-        if (!footer) {
-            return res.status(404).json({ message: "Footer data not found for this user" });
-        }
-
-        // Handle different request formats
-        let newHelpCenter;
-
-        if (req.body.sectionType === 'FooterHelpCenter' && req.body.data) {
-            // Frontend is sending structured data
-            const data = req.body.data;
-            newHelpCenter = {
-                leftSection: {
-                    image: data.leftSection?.image || "",
-                    title: data.leftSection?.title || "Have a Doubt We Can Help",
-                    subtitle: data.leftSection?.subtitle || "Boot For Consultation",
-                    icon: data.leftSection?.icon || "HeadphonesIcon",
-                    show: data.leftSection?.show !== false
-                },
-                rightSection: {
-                    image: data.rightSection?.image || "",
-                    title: data.rightSection?.title || "Cloud Computing Service",
-                    subtitle: data.rightSection?.subtitle || "Ckeck Eligibility",
-                    icon: data.rightSection?.icon || "CloudIcon",
-                    show: data.rightSection?.show !== false
-                }
-            };
-        } else {
-            // Handle file uploads for images
-            let leftImagePath = "";
-            let rightImagePath = "";
-
-            if (req.files && req.files["leftSection[image]"]) {
-                leftImagePath = req.files["leftSection[image]"][0].path;
-            }
-            if (req.files && req.files["rightSection[image]"]) {
-                rightImagePath = req.files["rightSection[image]"][0].path;
-            }
-
-            // Create new footer help center data
-            newHelpCenter = {
-                leftSection: {
-                    image: leftImagePath,
-                    title: req.body["leftSection[title]"] || "Have a Doubt We Can Help",
-                    subtitle: req.body["leftSection[subtitle]"] || "Boot For Consultation",
-                    icon: req.body["leftSection[icon]"] || "HeadphonesIcon",
-                    show: req.body["leftSection[show]"] === "true"
-                },
-                rightSection: {
-                    image: rightImagePath,
-                    title: req.body["rightSection[title]"] || "Cloud Computing Service",
-                    subtitle: req.body["rightSection[subtitle]"] || "Ckeck Eligibility",
-                    icon: req.body["rightSection[icon]"] || "CloudIcon",
-                    show: req.body["rightSection[show]"] === "true"
-                }
-            };
-        }
-
-        // Update the document
-        const updatedFooter = await HeaderData.findByIdAndUpdate(
-            userId,
-            { FooterHelpCenter: newHelpCenter },
-            { new: true }
-        );
-
-        // Convert Windows path to URL-friendly path for response
-        const fixPath = (path) => path ? `/${path.replace(/\\/g, '/')}` : "";
-
-        const responseData = {
-            ...newHelpCenter,
-            leftSection: {
-                ...newHelpCenter.leftSection,
-                image: fixPath(newHelpCenter.leftSection.image)
-            },
-            rightSection: {
-                ...newHelpCenter.rightSection,
-                image: fixPath(newHelpCenter.rightSection.image)
-            }
-        };
-
-        res.status(201).json({
-            message: "Footer help center created successfully",
-            data: responseData
-        });
-
-    } catch (error) {
-        console.error("Error creating footer help center:", error);
-        res.status(500).json({
-            message: "Error creating footer help center",
-            error: error.message
-        });
-    }
-};
-
-const getFooterHelpCenter = async (req, res) => {
-    try {
-        let userId = req.params.userId;
-
-        // Handle different request formats from frontend
-        if (!userId && req.query.userId) {
-            userId = req.query.userId;
-        }
-
-        // If still no userId, try to get from localStorage equivalent
-        if (!userId) {
-            // Try to get from query params or headers
-            userId = req.query.userId || req.headers['user-id'];
-        }
-
-        // If still no userId, try to get from localStorage (frontend equivalent)
-        if (!userId) {
-            // For the specific endpoint that frontend calls without userId
-            // We'll try to find any document with FooterHelpCenter data
-            const footer = await HeaderData.findOne({ FooterHelpCenter: { $exists: true, $ne: null } }).select("FooterHelpCenter");
-
-            if (!footer) {
-                return res.status(404).json({ message: "No footer help center data found" });
-            }
-
-            // Convert Windows path to URL-friendly path
-            const fixPath = (path) => path ? `/${path.replace(/\\/g, '/')}` : "";
-
-            const footerHelpCenter = footer.FooterHelpCenter ? {
-                ...footer.FooterHelpCenter.toObject(),
-                leftSection: {
-                    ...footer.FooterHelpCenter.leftSection,
-                    image: fixPath(footer.FooterHelpCenter.leftSection.image)
-                },
-                rightSection: {
-                    ...footer.FooterHelpCenter.rightSection,
-                    image: fixPath(footer.FooterHelpCenter.rightSection.image)
-                }
-            } : null;
-            console.log("footerHelpCenter", footerHelpCenter);
-
-            return res.status(200).json({
-                success: true,
-                data: footerHelpCenter
-            });
-        }
-
-        if (!mongoose.Types.ObjectId.isValid(userId)) {
-            return res.status(400).json({
-                message: "Invalid User ID. Please provide userId in params, query, or headers"
-            });
-        }
-
-        const footer = await HeaderData.findById(userId).select("FooterHelpCenter");
-
-        if (!footer) {
-            return res.status(404).json({ message: "Footer data not found for this user" });
-        }
-
-        // Convert Windows path to URL-friendly path
-        const fixPath = (path) => path ? `/${path.replace(/\\/g, '/')}` : "";
-
-        const footerHelpCenter = footer.FooterHelpCenter ? {
-            ...footer.FooterHelpCenter.toObject(),
-            leftSection: {
-                ...footer.FooterHelpCenter.leftSection,
-                image: fixPath(footer.FooterHelpCenter.leftSection.image)
-            },
-            rightSection: {
-                ...footer.FooterHelpCenter.rightSection,
-                image: fixPath(footer.FooterHelpCenter.rightSection.image)
-            }
-        } : null;
-
-        res.status(200).json({
-            success: true,
-            data: footerHelpCenter
-        });
-
-    } catch (error) {
-        console.error("Error getting footer help center:", error);
-        res.status(500).json({
-            message: "Error getting footer help center",
-            error: error.message
-        });
-    }
-};
-
-const updateFooterHelpCenter = async (req, res) => {
-    try {
-        let userId = req.params.userId;
-        const { helpCenterId } = req.params;
-
-        // Handle different request formats from frontend
-        if (!userId && req.body.userId) {
-            userId = req.body.userId;
-        }
-
-        // If still no userId, try to get from localStorage equivalent
-        if (!userId) {
-            // Try to get from query params or headers
-            userId = req.query.userId || req.headers['user-id'];
-        }
-
-        if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
-            return res.status(400).json({
-                message: "Invalid User ID. Please provide userId in params, body, or headers"
-            });
-        }
-
-        const footer = await HeaderData.findById(userId);
-
-        if (!footer) {
-            return res.status(404).json({ message: "Footer data not found for this user" });
-        }
-
-        // Handle different request formats
-        let updateData;
-
-        if (req.body.sectionType === 'FooterHelpCenter' && req.body.data) {
-            // Frontend is sending structured data
-            const data = req.body.data;
-            updateData = {
-                leftSection: {
-                    image: data.leftSection?.image || footer.FooterHelpCenter?.leftSection?.image || "",
-                    title: data.leftSection?.title || footer.FooterHelpCenter?.leftSection?.title || "Have a Doubt We Can Help",
-                    subtitle: data.leftSection?.subtitle || footer.FooterHelpCenter?.leftSection?.subtitle || "Boot For Consultation",
-                    icon: data.leftSection?.icon || footer.FooterHelpCenter?.leftSection?.icon || "HeadphonesIcon",
-                    show: data.leftSection?.show !== false
-                },
-                rightSection: {
-                    image: data.rightSection?.image || footer.FooterHelpCenter?.rightSection?.image || "",
-                    title: data.rightSection?.title || footer.FooterHelpCenter?.rightSection?.title || "Cloud Computing Service",
-                    subtitle: data.rightSection?.subtitle || footer.FooterHelpCenter?.rightSection?.subtitle || "Ckeck Eligibility",
-                    icon: data.rightSection?.icon || footer.FooterHelpCenter?.rightSection?.icon || "CloudIcon",
-                    show: data.rightSection?.show !== false
-                }
-            };
-        } else {
-            // Handle file uploads for images
-            let leftImagePath = footer.FooterHelpCenter?.leftSection?.image || "";
-            let rightImagePath = footer.FooterHelpCenter?.rightSection?.image || "";
-
-            if (req.files && req.files["leftSection[image]"]) {
-                leftImagePath = req.files["leftSection[image]"][0].path;
-            }
-            if (req.files && req.files["rightSection[image]"]) {
-                rightImagePath = req.files["rightSection[image]"][0].path;
-            }
-
-            // Update footer help center data
-            updateData = {
-                leftSection: {
-                    image: leftImagePath,
-                    title: req.body["leftSection[title]"] || footer.FooterHelpCenter?.leftSection?.title || "Have a Doubt We Can Help",
-                    subtitle: req.body["leftSection[subtitle]"] || footer.FooterHelpCenter?.leftSection?.subtitle || "Boot For Consultation",
-                    icon: req.body["leftSection[icon]"] || footer.FooterHelpCenter?.leftSection?.icon || "HeadphonesIcon",
-                    show: req.body["leftSection[show]"] === "true"
-                },
-                rightSection: {
-                    image: rightImagePath,
-                    title: req.body["rightSection[title]"] || footer.FooterHelpCenter?.rightSection?.title || "Cloud Computing Service",
-                    subtitle: req.body["rightSection[subtitle]"] || footer.FooterHelpCenter?.rightSection?.subtitle || "Ckeck Eligibility",
-                    icon: req.body["rightSection[icon]"] || footer.FooterHelpCenter?.rightSection?.icon || "CloudIcon",
-                    show: req.body["rightSection[show]"] === "true"
-                }
-            };
-        }
-
-        // Update the document
-        const updatedFooter = await HeaderData.findByIdAndUpdate(
-            userId,
-            { FooterHelpCenter: updateData },
-            { new: true }
-        );
-
-        // Convert Windows path to URL-friendly path for response
-        const fixPath = (path) => path ? `/${path.replace(/\\/g, '/')}` : "";
-
-        const responseData = {
-            ...updateData,
-            leftSection: {
-                ...updateData.leftSection,
-                image: fixPath(updateData.leftSection.image)
-            },
-            rightSection: {
-                ...updateData.rightSection,
-                image: fixPath(updateData.rightSection.image)
-            }
-        };
-
-        res.status(200).json({
-            message: "Footer help center updated successfully",
-            data: responseData
-        });
-
-    } catch (error) {
-        console.error("Error updating footer help center:", error);
-        res.status(500).json({
-            message: "Error updating footer help center",
-            error: error.message
-        });
-    }
-};
 
 // Footer Top Bar APIs
 const createFooterTopBar = async (req, res) => {
@@ -1379,6 +1051,150 @@ const getFooterTopBar = async (req, res) => {
     }
 };
 
+
+
+// Get Footer Help Center Form Data by User ID
+const getFooterHelpCenterForm = async (req, res) => {
+    try {
+        const { userId } = req.params;
+
+        if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({
+                success: false,
+                message: "Valid userId is required in params"
+            });
+        }
+
+        const footer = await HeaderData.findById(userId).select("FooterHelpCenter");
+
+        if (!footer) {
+            return res.status(404).json({
+                success: false,
+                message: "Footer data not found for this user"
+            });
+        }
+
+        // Convert Windows path to URL-friendly path
+        const fixPath = (path) => path ? `/${path.replace(/\\/g, '/')}` : "";
+
+        const footerHelpCenter = footer.FooterHelpCenter ? {
+            _id: footer._id,
+            ...footer.FooterHelpCenter.toObject(),
+            leftSection: {
+                ...footer.FooterHelpCenter.leftSection,
+                image: fixPath(footer.FooterHelpCenter.leftSection.image)
+            },
+            rightSection: {
+                ...footer.FooterHelpCenter.rightSection,
+                image: fixPath(footer.FooterHelpCenter.rightSection.image)
+            }
+        } : null;
+
+        res.status(200).json({
+            success: true,
+            data: footerHelpCenter
+        });
+
+    } catch (error) {
+        console.error("Error getting footer help center form:", error);
+        res.status(500).json({
+            success: false,
+            message: "Error getting footer help center form",
+            error: error.message
+        });
+    }
+};
+
+
+const postFooterTopBarData = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        if (!id) {
+            return res.status(400).json({ message: "User ID not found!" });
+        }
+
+        const {
+            leftTitle,
+            leftSubTitle,
+            rightTitle,
+            rightSubTitle
+        } = req.body;
+
+        const leftImagePath = req.files?.leftImage?.[0]?.path || "";
+        const rightImagePath = req.files?.rightImage?.[0]?.path || "";
+
+        const updateData = {
+            "FooterTopBar.leftSection.title": leftTitle,
+            "FooterTopBar.leftSection.subTitle": leftSubTitle,
+            ...(leftImagePath && { "FooterTopBar.leftSection.image": leftImagePath }),
+
+            "FooterTopBar.rightSection.title": rightTitle,
+            "FooterTopBar.rightSection.subTitle": rightSubTitle,
+            ...(rightImagePath && { "FooterTopBar.rightSection.image": rightImagePath }),
+        };
+
+        const updated = await HeaderData.findByIdAndUpdate(
+            id,
+            { $set: updateData },
+            { new: true, upsert: true }
+        );
+
+        res.status(200).json({
+            success: true,
+            message: "FooterTopBar updated successfully",
+            data: updated.FooterTopBar
+        });
+
+    } catch (error) {
+        console.error("Error updating FooterTopBar:", error);
+        res.status(500).json({
+            success: false,
+            message: "Error updating footer top bar section",
+            error: error.message
+        });
+    }
+};
+
+
+
+
+
+const getAllFooterData = async (req, res) => {
+    const { userId } = req.params;
+    try {
+        const footer = await HeaderData.findById(userId).select("FooterHelpCenter FooterTopBar FooterContact FooterRightContact FooterSponsors FooterBackground FooterCategories FooterTags FooterContact");
+        if (!footer) {
+            return res.status(404).json({
+                success: false,
+                message: "Footer data not found for this user"
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            data: footer.FooterHelpCenter,
+            FooterTopBar: footer.FooterTopBar,
+            FooterContact: footer.FooterContact,
+            FooterRightContact: footer.FooterRightContact,
+            FooterSponsors: footer.FooterSponsors,
+            FooterBackground: footer.FooterBackground,
+            FooterCategories: footer.FooterCategories,
+            FooterTags: footer.FooterTags,
+            FooterContact: footer.FooterContact,
+            FooterHelpCenter: footer.FooterHelpCenter,
+            FooterRightContact: footer.FooterRightContact,
+            FooterSponsors: footer.FooterSponsors,
+            FooterBackground: footer.FooterBackground,
+            FooterCategories: footer.FooterCategories,
+            FooterTags: footer.FooterTags,
+            FooterContact: footer.FooterContact,
+        });
+    } catch (error) {
+
+    }
+}
+
 module.exports = {
     updateFooterSponsorsById,
     getFooterSponsor,
@@ -1399,9 +1215,9 @@ module.exports = {
     getFooterRightContact,
     updateFooterRightContact,
     deleteFooterRightContact,
-    createFooterHelpCenter,
-    getFooterHelpCenter,
-    updateFooterHelpCenter,
     createFooterTopBar,
-    getFooterTopBar
+    getFooterTopBar,
+    getFooterHelpCenterForm,
+    getAllFooterData,
+    postFooterTopBarData
 };

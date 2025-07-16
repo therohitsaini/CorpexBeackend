@@ -174,31 +174,7 @@ const headerSchema = new mongoose.Schema({
         backgroundImage: { type: String }
     },
 
-    FooterTopBar: [
-        {
-            image: { type: String },
-            icon: { type: String },
-            text: { type: String },
-            show: { type: Boolean, default: true }
-        }
-    ],
 
-    FooterHelpCenter: {
-        leftSection: {
-            image: { type: String },
-            title: { type: String, default: "Have a Doubt We Can Help" },
-            subtitle: { type: String, default: "Boot For Consultation" },
-            icon: { type: String, default: "HeadphonesIcon" },
-            show: { type: Boolean, default: true }
-        },
-        rightSection: {
-            image: { type: String },
-            title: { type: String, default: "Cloud Computing Service" },
-            subtitle: { type: String, default: "Ckeck Eligibility" },
-            icon: { type: String, default: "CloudIcon" },
-            show: { type: Boolean, default: true }
-        }
-    },
 
     FooterContact: [
         {
@@ -245,7 +221,25 @@ const headerSchema = new mongoose.Schema({
             FooterTagesName: { type: String, required: true },
             listItem: { type: [String], default: [] }
         }
-    ]
+    ],
+    FooterTopBar: {
+        leftSection: {
+            title: { type: String },
+            subTitle: { type: String },
+            image: { type: String },
+            icon: { type: String, default: "" },
+            show: { type: Boolean, default: true }
+        },
+        rightSection: {
+            title: { type: String },
+            subTitle: { type: String },
+            image: { type: String },
+            icon: { type: String, default: "" },
+            show: { type: Boolean, default: true }
+        }
+    }
+
+
 
 
 });

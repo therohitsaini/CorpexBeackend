@@ -1,29 +1,27 @@
 const express = require("express");
 const {
-   updateFooterSponsorsById,
-   getFooterSponsor,
-   updateFooterBackground,
-   getFooterBackground,
-   createFooterCategory,
-   getFooterCategories,
-   updateFooterCategory,
-   createFooterTags,
-   getFooterTags,
-   updateFooterTags,
-   createFooterContact,
-   getFooterContact,
-   updateFooterContact,
-   deleteFooterContact,
-   deleteFooterContactIcon,
-   createFooterRightContact,
-   getFooterRightContact,
-   updateFooterRightContact,
-   deleteFooterRightContact,
-   createFooterHelpCenter,
-   getFooterHelpCenter,
-   updateFooterHelpCenter,
-   createFooterTopBar,
-   getFooterTopBar
+    updateFooterSponsorsById,
+    getFooterSponsor,
+    updateFooterBackground,
+    getFooterBackground,
+    createFooterCategory,
+    getFooterCategories,
+    updateFooterCategory,
+    createFooterTags,
+    getFooterTags,
+    updateFooterTags,
+    createFooterContact,
+    getFooterContact,
+    updateFooterContact,
+    deleteFooterContact,
+    deleteFooterContactIcon,
+    createFooterRightContact,
+    getFooterRightContact,
+    updateFooterRightContact,
+    deleteFooterRightContact,
+    getFooterHelpCenterForm,
+    getAllFooterData,
+    postFooterTopBarData
 } = require("../Controller/adminFooterController");
 const { upload, siteupload } = require("../Middleware/FileStorage");
 
@@ -51,7 +49,7 @@ footerRoute.get("/api-footer-get/:userId", getFooterCategories);
 footerRoute.put("/api-footer-update/:categoryId", updateFooterCategory);
 
 // Footer Tags routes
-footerRoute.post("/api-footer-tags/post", createFooterTags);   
+footerRoute.post("/api-footer-tags/post", createFooterTags);
 footerRoute.get("/api-footer-tags-get/:userId", getFooterTags);
 footerRoute.put("/api-footer-tags-update/:tagsId", updateFooterTags);
 
@@ -72,30 +70,23 @@ footerRoute.get("/footer-right-contact/get", getFooterRightContact);
 footerRoute.put("/footer-right-contact/update/:contactId", updateFooterRightContact);
 footerRoute.delete("/footer-right-contact/delete/:contactId", deleteFooterRightContact);
 
-// Footer Help Center routes
-footerRoute.post("/footer-help-center/:userId", siteupload.fields([
-    { name: "leftSection[image]", maxCount: 1 },
-    { name: "rightSection[image]", maxCount: 1 }
-]), createFooterHelpCenter);
-footerRoute.get("/footer-help-center/:userId", getFooterHelpCenter);
-footerRoute.put("/footer-help-center/:userId/:helpCenterId", siteupload.fields([
-    { name: "leftSection[image]", maxCount: 1 },
-    { name: "rightSection[image]", maxCount: 1 }
-]), updateFooterHelpCenter);
 
-// Additional routes for frontend compatibility
-footerRoute.get("/get/FooterHelpCenter/:userId", getFooterHelpCenter);
-footerRoute.get("/get/FooterHelpCenter", getFooterHelpCenter);
-footerRoute.get("/footer-section/get/FooterHelpCenter", getFooterHelpCenter);
-footerRoute.post("/footer-section/create", createFooterHelpCenter);
-footerRoute.put("/footer-section/update/:helpCenterId", updateFooterHelpCenter);
 
-// Footer Top Bar routes
-footerRoute.post("/footer-top-bar/:userId", siteupload.fields([
-    { name: "image", maxCount: 1 }
-]), createFooterTopBar);
-footerRoute.get("/footer-top-bar/:userId", getFooterTopBar);
+footerRoute.get("/footer-help-center-form/:userId", getFooterHelpCenterForm);
+
+// Footer All Data routes
+footerRoute.get("/footer-all-data/:userId", getAllFooterData);
+
+// footer top bar
+footerRoute.post(
+    '/footer-top-bar/:id',
+    upload.fields([
+        { name: 'leftImage', maxCount: 1 },
+        { name: 'rightImage', maxCount: 1 }
+    ]),
+    postFooterTopBarData
+);
 
 module.exports = {
-   footerRoute
+    footerRoute
 };

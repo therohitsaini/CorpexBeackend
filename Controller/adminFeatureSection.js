@@ -58,24 +58,23 @@ const { ObjectId } = mongoose.Types;
 
 
 
-
+// feature Heading section create-update-
 const updateAndCreateFeatureSectionStore = async (req, res) => {
-    const id = req.params.id;       // ID of HeaderData document (user)
-    const sectionId = req.params.sectionId; // ID of section to update (optional)
+    const id = req.params.id;
+    const sectionId = req.params.sectionId;
+    console.log(id, sectionId)
 
-    const { sectionlistTitle, setionDescriptions } = req.body;
+    const { sectionTitle, setionDescriptions } = req.body;
     const setionImage = req.file ? `/uploadsStore/${id}/${req.file.filename}` : "";
 
-    if (!sectionlistTitle || !setionDescriptions) {
+    if (!sectionTitle || !setionDescriptions) {
         return res.status(400).json({ message: "All fields are required" });
     }
 
     try {
-        // Check if HeaderData document exists
         let userData = await HeaderData.findById(id);
 
         if (!userData) {
-            // 🆕 Create HeaderData doc if it doesn't exist
             userData = new HeaderData({
                 _id: id,
                 FeatureSectionStore: [],
@@ -85,23 +84,21 @@ const updateAndCreateFeatureSectionStore = async (req, res) => {
         let message;
 
         if (sectionId) {
-            // 🔁 Update specific section in FeatureSectionStore by ID
             const section = userData.FeatureSectionStore.id(sectionId);
 
             if (!section) {
                 return res.status(404).json({ message: "Section not found" });
             }
 
-            section.sectionlistTitle = sectionlistTitle;
+            section.sectionTitle = sectionTitle;
             section.setionDescriptions = setionDescriptions;
             if (setionImage) section.setionImage = setionImage;
 
             message = "Feature section updated successfully.";
         } else {
-            // ➕ Add a new section
             userData.FeatureSectionStore.push({
                 _id: new mongoose.Types.ObjectId(),
-                sectionlistTitle,
+                sectionTitle,
                 setionDescriptions,
                 setionImage,
             });
@@ -307,12 +304,12 @@ const deleteFeatureListItem = async (request, response) => {
 // FeatureSectionListItem    Uupdate api 
 
 const updateFeatureListItem = async (request, response) => {
-    const { userId, userDocID } = request.params
-    if (!userId || !userDocID) {
+    const { id, userDocID } = request.params
+    if (!id || !userDocID) {
         return res.status(400).send({ message: "Id Not found" })
     }
     try {
-        const userObjectId = new mongoose.Types.ObjectId(userId);
+        const userObjectId = new mongoose.Types.ObjectId(id);
         const userDocsObjectId = new mongoose.Types.ObjectId(userDocID);
 
         const updateFields = {
@@ -324,7 +321,7 @@ const updateFeatureListItem = async (request, response) => {
         };
         if (request.file) {
             updateFields["FeatureSectionListItem.$.backGroundImage"] =
-                `/uploadsStore/${request.params.userId}/${request.file.filename}`;
+                `/uploadsStore/${request.params.id}/${request.file.filename}`;
         }
 
 
