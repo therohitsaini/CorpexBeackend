@@ -222,10 +222,11 @@ const headerSchema = new mongoose.Schema({
             listItem: { type: [String], default: [] }
         }
     ],
-    FooterTopBar: {
+    FooterHelpCenter: {
         leftSection: {
             title: { type: String },
             subTitle: { type: String },
+            description: { type: String },
             image: { type: String },
             icon: { type: String, default: "" },
             show: { type: Boolean, default: true }
@@ -233,9 +234,25 @@ const headerSchema = new mongoose.Schema({
         rightSection: {
             title: { type: String },
             subTitle: { type: String },
+            description: { type: String },
             image: { type: String },
             icon: { type: String, default: "" },
             show: { type: Boolean, default: true }
+        }
+    },
+
+    FooterTopBar: {
+        leftSection: {
+            title: { type: String },
+            subTitle: { type: String },
+            icone: { type: String },
+            image: { type: String }
+        },
+        rightSection: {
+            title: { type: String },
+            subTitle: { type: String },
+            icone: { type: String },
+            image: { type: String }
         }
     }
 

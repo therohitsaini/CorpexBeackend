@@ -956,100 +956,7 @@ const deleteFooterRightContact = async (req, res) => {
 
 
 
-// Footer Top Bar APIs
-const createFooterTopBar = async (req, res) => {
-    try {
-        const { userId } = req.params;
 
-        if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
-            return res.status(400).json({
-                message: "Invalid User ID. Please provide userId in params"
-            });
-        }
-
-        const footer = await HeaderData.findById(userId);
-
-        if (!footer) {
-            return res.status(404).json({ message: "Footer data not found for this user" });
-        }
-
-        // Handle file upload for image
-        let imagePath = "";
-        if (req.files && req.files["image"]) {
-            imagePath = req.files["image"][0].path;
-        }
-
-        // Create new footer top bar
-        const newTopBar = {
-            image: imagePath,
-            icon: req.body.icon || "",
-            text: req.body.text || "",
-            show: req.body.show === "true"
-        };
-
-        // Add to FooterTopBar array
-        footer.FooterTopBar.push(newTopBar);
-        await footer.save();
-
-        // Convert Windows path to URL-friendly path for response
-        const fixPath = (path) => path ? `/${path.replace(/\\/g, '/')}` : "";
-
-        const responseData = {
-            ...newTopBar,
-            image: fixPath(newTopBar.image)
-        };
-
-        res.status(201).json({
-            message: "Footer top bar created successfully",
-            data: responseData
-        });
-
-    } catch (error) {
-        console.error("Error creating footer top bar:", error);
-        res.status(500).json({
-            message: "Error creating footer top bar",
-            error: error.message
-        });
-    }
-};
-
-const getFooterTopBar = async (req, res) => {
-    try {
-        const { userId } = req.params;
-
-        if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
-            return res.status(400).json({
-                message: "Invalid User ID. Please provide userId in params"
-            });
-        }
-
-        const footer = await HeaderData.findById(userId).select("FooterTopBar");
-
-        if (!footer) {
-            return res.status(404).json({ message: "Footer data not found for this user" });
-        }
-
-        // Convert Windows path to URL-friendly path
-        const fixPath = (path) => path ? `/${path.replace(/\\/g, '/')}` : "";
-
-        const footerTopBar = footer.FooterTopBar.map(item => ({
-            ...item.toObject(),
-            image: fixPath(item.image)
-        }));
-
-        res.status(200).json({
-            success: true,
-            data: footerTopBar
-        });
-
-    } catch (error) {
-        console.error("Error getting footer top bar:", error);
-        res.status(500).json({
-            message: "Error getting footer top bar",
-            error: error.message
-        });
-    }
-};
 
 
 
@@ -1082,11 +989,11 @@ const getFooterHelpCenterForm = async (req, res) => {
             ...footer.FooterHelpCenter.toObject(),
             leftSection: {
                 ...footer.FooterHelpCenter.leftSection,
-                image: fixPath(footer.FooterHelpCenter.leftSection.image)
+                image: fixPath(footer.FooterHelpCenter.leftSection?.image)
             },
             rightSection: {
                 ...footer.FooterHelpCenter.rightSection,
-                image: fixPath(footer.FooterHelpCenter.rightSection.image)
+                image: fixPath(footer.FooterHelpCenter.rightSection?.image)
             }
         } : null;
 
@@ -1106,55 +1013,7 @@ const getFooterHelpCenterForm = async (req, res) => {
 };
 
 
-const postFooterTopBarData = async (req, res) => {
-    const { id } = req.params;
 
-    try {
-        if (!id) {
-            return res.status(400).json({ message: "User ID not found!" });
-        }
-
-        const {
-            leftTitle,
-            leftSubTitle,
-            rightTitle,
-            rightSubTitle
-        } = req.body;
-
-        const leftImagePath = req.files?.leftImage?.[0]?.path || "";
-        const rightImagePath = req.files?.rightImage?.[0]?.path || "";
-
-        const updateData = {
-            "FooterTopBar.leftSection.title": leftTitle,
-            "FooterTopBar.leftSection.subTitle": leftSubTitle,
-            ...(leftImagePath && { "FooterTopBar.leftSection.image": leftImagePath }),
-
-            "FooterTopBar.rightSection.title": rightTitle,
-            "FooterTopBar.rightSection.subTitle": rightSubTitle,
-            ...(rightImagePath && { "FooterTopBar.rightSection.image": rightImagePath }),
-        };
-
-        const updated = await HeaderData.findByIdAndUpdate(
-            id,
-            { $set: updateData },
-            { new: true, upsert: true }
-        );
-
-        res.status(200).json({
-            success: true,
-            message: "FooterTopBar updated successfully",
-            data: updated.FooterTopBar
-        });
-
-    } catch (error) {
-        console.error("Error updating FooterTopBar:", error);
-        res.status(500).json({
-            success: false,
-            message: "Error updating footer top bar section",
-            error: error.message
-        });
-    }
-};
 
 
 
@@ -1163,7 +1022,7 @@ const postFooterTopBarData = async (req, res) => {
 const getAllFooterData = async (req, res) => {
     const { userId } = req.params;
     try {
-        const footer = await HeaderData.findById(userId).select("FooterHelpCenter FooterTopBar FooterContact FooterRightContact FooterSponsors FooterBackground FooterCategories FooterTags FooterContact");
+        const footer = await HeaderData.findById(userId).select("FooterHelpCenter FooterContact FooterRightContact FooterSponese FooterBackground FooterCategory FooterTags FooterTopBar");
         if (!footer) {
             return res.status(404).json({
                 success: false,
@@ -1171,29 +1030,373 @@ const getAllFooterData = async (req, res) => {
             });
         }
 
+        // Convert Windows path to URL-friendly path
+        const fixPath = (path) => path ? `/${path.replace(/\\/g, '/')}` : "";
+
+        // Process FooterContact logo
+        const processedFooterContact = footer.FooterContact?.length > 0 ? {
+            ...footer.FooterContact[0].toObject(),
+            logo: fixPath(footer.FooterContact[0].logo)
+        } : null;
+
+        // Process FooterBackground image
+        const processedFooterBackground = footer.FooterBackground ? {
+            ...footer.FooterBackground,
+            backgroundImage: fixPath(footer.FooterBackground.backgroundImage)
+        } : null;
+
+        // Process FooterSponsors images
+        const processedFooterSponsors = footer.FooterSponese?.length > 0 ? {
+            sponsorsOne: fixPath(footer.FooterSponese[0].sponsorsOne),
+            sponsorsTwo: fixPath(footer.FooterSponese[0].sponsorsTwo),
+            sponsorsThree: fixPath(footer.FooterSponese[0].sponsorsThree),
+            sponsorsFour: fixPath(footer.FooterSponese[0].sponsorsFour),
+            sponsorsFive: fixPath(footer.FooterSponese[0].sponsorsFive)
+        } : null;
+
         res.status(200).json({
             success: true,
-            data: footer.FooterHelpCenter,
-            FooterTopBar: footer.FooterTopBar,
-            FooterContact: footer.FooterContact,
-            FooterRightContact: footer.FooterRightContact,
-            FooterSponsors: footer.FooterSponsors,
-            FooterBackground: footer.FooterBackground,
-            FooterCategories: footer.FooterCategories,
-            FooterTags: footer.FooterTags,
-            FooterContact: footer.FooterContact,
-            FooterHelpCenter: footer.FooterHelpCenter,
-            FooterRightContact: footer.FooterRightContact,
-            FooterSponsors: footer.FooterSponsors,
-            FooterBackground: footer.FooterBackground,
-            FooterCategories: footer.FooterCategories,
-            FooterTags: footer.FooterTags,
-            FooterContact: footer.FooterContact,
+            FooterContact: processedFooterContact,
+            FooterRightContact: footer.FooterRightContact?.length > 0 ? footer.FooterRightContact[0] : null,
+            FooterSponsors: processedFooterSponsors,
+            FooterBackground: processedFooterBackground,
+            FooterCategories: footer.FooterCategory || [],
+            FooterTags: footer.FooterTags || [],
+            FooterTopBar: footer.FooterTopBar ? {
+                ...footer.FooterTopBar.toObject(),
+                leftSection: {
+                    ...footer.FooterTopBar.leftSection,
+                    image: fixPath(footer.FooterTopBar.leftSection?.image)
+                },
+                rightSection: {
+                    ...footer.FooterTopBar.rightSection,
+                    image: fixPath(footer.FooterTopBar.rightSection?.image)
+                }
+            } : null
         });
     } catch (error) {
-
+        console.error("Error getting all footer data:", error);
+        res.status(500).json({
+            success: false,
+            message: "Error getting all footer data",
+            error: error.message
+        });
     }
 }
+
+// Footer Sponsors Management APIs
+const getFooterSponsors = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: "Invalid ID" });
+        }
+
+        const footer = await HeaderData.findById(id).select("FooterSponese");
+
+        if (!footer) {
+            return res.status(404).json({ message: "Footer data not found" });
+        }
+
+        // Convert Windows path to URL-friendly path
+        const fixPath = (p) => p ? `/${p.replace(/\\/g, '/')}` : "";
+
+        const sponsorsData = footer.FooterSponese.length > 0 ? {
+            Image_one: fixPath(footer.FooterSponese[0].sponsorsOne),
+            Image_two: fixPath(footer.FooterSponese[0].sponsorsTwo),
+            Image_three: fixPath(footer.FooterSponese[0].sponsorsThree),
+            Image_four: fixPath(footer.FooterSponese[0].sponsorsFour),
+            Image_five: fixPath(footer.FooterSponese[0].sponsorsFive)
+        } : {
+            Image_one: "",
+            Image_two: "",
+            Image_three: "",
+            Image_four: "",
+            Image_five: ""
+        };
+
+        res.status(200).json({ 
+            success: true, 
+            data: sponsorsData 
+        });
+
+    } catch (error) {
+        console.error("Error getting footer sponsors:", error);
+        res.status(500).json({ 
+            message: "Error getting footer sponsors", 
+            error: error.message 
+        });
+    }
+};
+
+const updateFooterSponsors = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: "Invalid ID" });
+        }
+
+        const footer = await HeaderData.findById(id);
+
+        if (!footer) {
+            return res.status(404).json({ message: "Footer data not found" });
+        }
+
+        // Handle file uploads for sponsor images
+        const filePaths = {
+            sponsorsOne: req.files["Image_one"]?.[0]?.path || "",
+            sponsorsTwo: req.files["Image_two"]?.[0]?.path || "",
+            sponsorsThree: req.files["Image_three"]?.[0]?.path || "",
+            sponsorsFour: req.files["Image_four"]?.[0]?.path || "",
+            sponsorsFive: req.files["Image_five"]?.[0]?.path || "",
+        };
+
+        // Create new sponsor data
+        const newSponsorData = {
+            sponsorsOne: filePaths.sponsorsOne,
+            sponsorsTwo: filePaths.sponsorsTwo,
+            sponsorsThree: filePaths.sponsorsThree,
+            sponsorsFour: filePaths.sponsorsFour,
+            sponsorsFive: filePaths.sponsorsFive,
+            showOnWebsite: true,
+            userId: id
+        };
+
+        // Update or create sponsor data
+        if (footer.FooterSponese.length > 0) {
+            // Update existing sponsor data, preserving non-empty fields
+            const existingSponsor = footer.FooterSponese[0];
+            footer.FooterSponese[0] = {
+                ...existingSponsor,
+                sponsorsOne: filePaths.sponsorsOne || existingSponsor.sponsorsOne,
+                sponsorsTwo: filePaths.sponsorsTwo || existingSponsor.sponsorsTwo,
+                sponsorsThree: filePaths.sponsorsThree || existingSponsor.sponsorsThree,
+                sponsorsFour: filePaths.sponsorsFour || existingSponsor.sponsorsFour,
+                sponsorsFive: filePaths.sponsorsFive || existingSponsor.sponsorsFive,
+            };
+        } else {
+            // Create new sponsor data
+            footer.FooterSponese.push(newSponsorData);
+        }
+
+        await footer.save();
+
+        // Convert Windows path to URL-friendly path for response
+        const fixPath = (p) => p ? `/${p.replace(/\\/g, '/')}` : "";
+
+        const responseData = {
+            Image_one: fixPath(footer.FooterSponese[0].sponsorsOne),
+            Image_two: fixPath(footer.FooterSponese[0].sponsorsTwo),
+            Image_three: fixPath(footer.FooterSponese[0].sponsorsThree),
+            Image_four: fixPath(footer.FooterSponese[0].sponsorsFour),
+            Image_five: fixPath(footer.FooterSponese[0].sponsorsFive)
+        };
+
+        res.status(200).json({ 
+            message: "Footer sponsors updated successfully", 
+            data: responseData 
+        });
+
+    } catch (error) {
+        console.error("Error updating footer sponsors:", error);
+        res.status(500).json({ 
+            message: "Error updating footer sponsors", 
+            error: error.message 
+        });
+    }
+};
+
+const createFooterSponsors = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: "Invalid ID" });
+        }
+
+        const footer = await HeaderData.findById(id);
+
+        if (!footer) {
+            return res.status(404).json({ message: "Footer data not found" });
+        }
+
+        // Handle file uploads for sponsor images
+        const filePaths = {
+            sponsorsOne: req.files["Image_one"]?.[0]?.path || "",
+            sponsorsTwo: req.files["Image_two"]?.[0]?.path || "",
+            sponsorsThree: req.files["Image_three"]?.[0]?.path || "",
+            sponsorsFour: req.files["Image_four"]?.[0]?.path || "",
+            sponsorsFive: req.files["Image_five"]?.[0]?.path || "",
+        };
+
+        // Create new sponsor data
+        const newSponsorData = {
+            sponsorsOne: filePaths.sponsorsOne,
+            sponsorsTwo: filePaths.sponsorsTwo,
+            sponsorsThree: filePaths.sponsorsThree,
+            sponsorsFour: filePaths.sponsorsFour,
+            sponsorsFive: filePaths.sponsorsFive,
+            showOnWebsite: true,
+            userId: id
+        };
+
+        // Add to FooterSponese array
+        footer.FooterSponese.push(newSponsorData);
+        await footer.save();
+
+        // Convert Windows path to URL-friendly path for response
+        const fixPath = (p) => p ? `/${p.replace(/\\/g, '/')}` : "";
+
+        const responseData = {
+            Image_one: fixPath(newSponsorData.sponsorsOne),
+            Image_two: fixPath(newSponsorData.sponsorsTwo),
+            Image_three: fixPath(newSponsorData.sponsorsThree),
+            Image_four: fixPath(newSponsorData.sponsorsFour),
+            Image_five: fixPath(newSponsorData.sponsorsFive)
+        };
+
+        res.status(201).json({ 
+            message: "Footer sponsors created successfully", 
+            data: responseData 
+        });
+
+    } catch (error) {
+        console.error("Error creating footer sponsors:", error);
+        res.status(500).json({ 
+            message: "Error creating footer sponsors", 
+            error: error.message 
+        });
+    }
+};
+
+// Footer Top Bar APIs
+const createFooterTopBar = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: "Invalid ID" });
+        }
+
+        const footer = await HeaderData.findById(id);
+
+        if (!footer) {
+            return res.status(404).json({ message: "Footer data not found" });
+        }
+
+        // Handle file uploads for top bar images
+        const leftImagePath = req.files["leftImage"]?.[0]?.path || "";
+        const rightImagePath = req.files["rightImage"]?.[0]?.path || "";
+
+        // Create footer top bar data
+        const footerTopBarData = {
+            leftSection: {
+                title: req.body.leftTitle || "",
+                subTitle: req.body.leftSubTitle || "",
+                icone: req.body.leftIcone || "",
+                image: leftImagePath
+            },
+            rightSection: {
+                title: req.body.rightTitle || "",
+                subTitle: req.body.rightSubTitle || "",
+                icone: req.body.rightIcone || "",
+                image: rightImagePath
+            }
+        };
+
+        // Update or create footer top bar
+        footer.FooterTopBar = footerTopBarData;
+        await footer.save();
+
+        // Convert Windows path to URL-friendly path for response
+        const fixPath = (p) => p ? `/${p.replace(/\\/g, '/')}` : "";
+
+        const responseData = {
+            leftSection: {
+                ...footerTopBarData.leftSection,
+                image: fixPath(footerTopBarData.leftSection.image)
+            },
+            rightSection: {
+                ...footerTopBarData.rightSection,
+                image: fixPath(footerTopBarData.rightSection.image)
+            }
+        };
+
+        res.status(200).json({ 
+            message: "Footer top bar updated successfully", 
+            data: responseData 
+        });
+
+    } catch (error) {
+        console.error("Error updating footer top bar:", error);
+        res.status(500).json({ 
+            message: "Error updating footer top bar", 
+            error: error.message 
+        });
+    }
+};
+
+const getFooterTopBar = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: "Invalid ID" });
+        }
+
+        const footer = await HeaderData.findById(id).select("FooterTopBar");
+
+        if (!footer) {
+            return res.status(404).json({ message: "Footer data not found" });
+        }
+
+        // Convert Windows path to URL-friendly path
+        const fixPath = (p) => p ? `/${p.replace(/\\/g, '/')}` : "";
+
+        const footerTopBar = footer.FooterTopBar ? {
+            leftSection: {
+                title: footer.FooterTopBar.leftSection?.title || "",
+                subTitle: footer.FooterTopBar.leftSection?.subTitle || "",
+                icone: footer.FooterTopBar.leftSection?.icone || "",
+                image: fixPath(footer.FooterTopBar.leftSection?.image)
+            },
+            rightSection: {
+                title: footer.FooterTopBar.rightSection?.title || "",
+                subTitle: footer.FooterTopBar.rightSection?.subTitle || "",
+                icone: footer.FooterTopBar.rightSection?.icone || "",
+                image: fixPath(footer.FooterTopBar.rightSection?.image)
+            }
+        } : {
+            leftSection: {
+                title: "",
+                subTitle: "",
+                icone: "",
+                image: ""
+            },
+            rightSection: {
+                title: "",
+                subTitle: "",
+                icone: "",
+                image: ""
+            }
+        };
+
+        res.status(200).json({ 
+            success: true, 
+            data: footerTopBar 
+        });
+
+    } catch (error) {
+        console.error("Error getting footer top bar:", error);
+        res.status(500).json({ 
+            message: "Error getting footer top bar", 
+            error: error.message 
+        });
+    }
+};
+
 
 module.exports = {
     updateFooterSponsorsById,
@@ -1215,9 +1418,11 @@ module.exports = {
     getFooterRightContact,
     updateFooterRightContact,
     deleteFooterRightContact,
+    getFooterSponsors,
+    updateFooterSponsors,
+    createFooterSponsors,
     createFooterTopBar,
     getFooterTopBar,
     getFooterHelpCenterForm,
-    getAllFooterData,
-    postFooterTopBarData
+    getAllFooterData
 };

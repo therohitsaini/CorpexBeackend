@@ -19,9 +19,13 @@ const {
     getFooterRightContact,
     updateFooterRightContact,
     deleteFooterRightContact,
+    getFooterSponsors,
+    updateFooterSponsors,
+    createFooterSponsors,
+    createFooterTopBar,
+    getFooterTopBar,
     getFooterHelpCenterForm,
-    getAllFooterData,
-    postFooterTopBarData
+    getAllFooterData
 } = require("../Controller/adminFooterController");
 const { upload, siteupload } = require("../Middleware/FileStorage");
 
@@ -37,6 +41,31 @@ footerRoute.put("/update-sponsors/:id", upload.fields([
 ]), updateFooterSponsorsById);
 
 footerRoute.get("/get-sponsors/:id", getFooterSponsor);
+
+// New Footer Sponsors Management routes (matching frontend requirements)
+footerRoute.get("/get-footer-sponsors/:id", getFooterSponsors);
+footerRoute.put("/update-footer-sponsors/:id", upload.fields([
+    { name: "Image_one", maxCount: 1 },
+    { name: "Image_two", maxCount: 1 },
+    { name: "Image_three", maxCount: 1 },
+    { name: "Image_four", maxCount: 1 },
+    { name: "Image_five", maxCount: 1 }
+]), updateFooterSponsors);
+footerRoute.post("/create-footer-sponsors/:id", upload.fields([
+    { name: "Image_one", maxCount: 1 },
+    { name: "Image_two", maxCount: 1 },
+    { name: "Image_three", maxCount: 1 },
+    { name: "Image_four", maxCount: 1 },
+    { name: "Image_five", maxCount: 1 }
+]), createFooterSponsors);
+
+// Footer Top Bar routes
+footerRoute.post("/footer-top-bar/:id", upload.fields([
+    { name: "leftImage", maxCount: 1 },
+    { name: "rightImage", maxCount: 1 }
+]), createFooterTopBar);
+
+footerRoute.get("/get-footer-top-bar/:id", getFooterTopBar);
 
 footerRoute.put("/update-footer-background/:id", siteupload.fields([
     { name: "backgroundImage", maxCount: 1 }
@@ -76,16 +105,6 @@ footerRoute.get("/footer-help-center-form/:userId", getFooterHelpCenterForm);
 
 // Footer All Data routes
 footerRoute.get("/footer-all-data/:userId", getAllFooterData);
-
-// footer top bar
-footerRoute.post(
-    '/footer-top-bar/:id',
-    upload.fields([
-        { name: 'leftImage', maxCount: 1 },
-        { name: 'rightImage', maxCount: 1 }
-    ]),
-    postFooterTopBarData
-);
 
 module.exports = {
     footerRoute
