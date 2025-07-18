@@ -1,5 +1,5 @@
 const express = require("express")
-const { updateAndCreateTeamStore, getTeamHeading, postTeamInformation, getTeamCard, deleteTeamCardData } = require("../Controller/adminTeamController")
+const { updateAndCreateTeamStore, getTeamHeading, postTeamInformation, getTeamCard, deleteTeamCardData, updateTeamMember } = require("../Controller/adminTeamController")
 const { siteupload } = require("../Middleware/FileStorage")
 const teamRoute = express.Router()
 
@@ -11,6 +11,7 @@ teamRoute.put('/api-team/create-update/:id', siteupload.single('teamBgImage'), u
 teamRoute.put('/api-team/create-update/:id/:sectionId', siteupload.single('teamBgImage'), updateAndCreateTeamStore);
 teamRoute.get("/api-get/team-heading/:id", getTeamHeading)
 teamRoute.post("/api-post-team/:id", siteupload.single("image"), postTeamInformation)
+teamRoute.put("/api-update-team/:docsId", siteupload.single("image"), updateTeamMember)
 teamRoute.get("/api-get-team-card/:id", getTeamCard)
 teamRoute.delete("/api-delete-team-card/",deleteTeamCardData)
 

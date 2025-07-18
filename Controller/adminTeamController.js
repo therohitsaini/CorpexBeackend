@@ -190,6 +190,74 @@ const deleteTeamCardData = async (request, response) => {
     }
 }
 
+const updateTeamMember = async (request, response) => {
+    const { docsId } = request.params;
+    const { name, role } = request.body;
+
+    try {
+        if (!docsId || !mongoose.Types.ObjectId.isValid(docsId)) {
+            return response.status(400).json({ message: "Invalid team member ID!" });
+        }
+
+        const item_Icone = JSON.parse(request.body.item_Icone);
+        const urls = JSON.parse(request.body.urls);
+
+        // Find the document that contains this team member
+        const userData = await HeaderData.findOne({
+            "TeamCardSection._id": new ObjectId(docsId)
+        });
+
+        if (!userData) {
+            return response.status(404).json({ message: "Team member not found!" });
+        }
+
+        // Find the specific team member in the array
+        const teamMemberIndex = userData.TeamCardSection.findIndex(
+            member => member._id.toString() === docsId
+        );
+
+        if (teamMemberIndex === -1) {
+            return response.status(404).json({ message: "Team member not found!" });
+        }
+
+        // Update the team member data
+        const updateData = {
+            name: name || userData.TeamCardSection[teamMemberIndex].name,
+            role: role || userData.TeamCardSection[teamMemberIndex].role,
+            item_Icone: item_Icone || userData.TeamCardSection[teamMemberIndex].item_Icone,
+            urls: urls || userData.TeamCardSection[teamMemberIndex].urls,
+        };
+
+        // Handle image update if a new image is uploaded
+        if (request.file) {
+            updateData.image = `/uploadsStore/${userData._id}/${request.file.filename}`;
+        } else {
+            // Keep the existing image path
+            updateData.image = userData.TeamCardSection[teamMemberIndex].image || "";
+        }
+
+        // Update the team member
+        userData.TeamCardSection[teamMemberIndex] = {
+            ...userData.TeamCardSection[teamMemberIndex],
+            ...updateData
+        };
+
+        await userData.save();
+
+        return response.status(200).json({
+            message: "Team member updated successfully.",
+            data: userData.TeamCardSection[teamMemberIndex]
+        });
+
+    } catch (error) {
+        console.error("Error updating team member:", error);
+        return response.status(500).json({ 
+            message: "Internal server error.",
+            error: error.message 
+        });
+    }
+}
+
 
 
 
@@ -198,5 +266,6 @@ module.exports = {
     getTeamHeading,
     postTeamInformation,
     getTeamCard,
-    deleteTeamCardData
+    deleteTeamCardData,
+    updateTeamMember
 }
