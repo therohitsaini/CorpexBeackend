@@ -1398,6 +1398,304 @@ const getFooterTopBar = async (req, res) => {
 };
 
 
+// Footer Copyright APIs
+const getFooterCopyRight = async (req, res) => {
+    try {
+        const { userId } = req.params;
+
+        if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid User ID"
+            });
+        }
+
+        const footer = await HeaderData.findById(userId).select("FooterCopyRight");
+
+        if (!footer) {
+            return res.status(404).json({
+                success: false,
+                message: "Footer data not found for this user"
+            });
+        }
+
+        // Return the first copyright entry or create default structure
+        const copyrightData = footer.FooterCopyRight && footer.FooterCopyRight.length > 0 
+            ? footer.FooterCopyRight[0] 
+            : {
+                section: 'copyright',
+                copyrightText: 'Copyright © 2023 Corpex | Powered By Corpex',
+                poweredByText: 'Corpex',
+                paymentIcons: [
+                    { id: 1, name: 'Payment 1', icon: '', url: '', isActive: true }
+                ]
+            };
+
+        res.status(200).json({
+            success: true,
+            data: [copyrightData] // Return as array to match frontend expectation
+        });
+
+    } catch (error) {
+        console.error("Error getting footer copyright:", error);
+        res.status(500).json({
+            success: false,
+            message: "Error getting footer copyright",
+            error: error.message
+        });
+    }
+};
+
+const createUpdateFooterCopyRight = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const { section, copyrightText, poweredByText, paymentIcons } = req.body;
+
+        console.log("Received request:", { userId, section, copyrightText, poweredByText, paymentIcons });
+
+        if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid User ID"
+            });
+        }
+
+        if (!copyrightText || !poweredByText) {
+            return res.status(400).json({
+                success: false,
+                message: "Copyright text and powered by text are required"
+            });
+        }
+
+        // Use findOneAndUpdate for better atomicity
+        const copyrightData = {
+            section: section || 'copyright',
+            copyrightText,
+            poweredByText,
+            paymentIcons: Array.isArray(paymentIcons) ? paymentIcons : []
+        };
+
+        // Try to update existing copyright first
+        let footer = await HeaderData.findOneAndUpdate(
+            { 
+                _id: userId,
+                "FooterCopyRight.section": "copyright"
+            },
+            {
+                $set: {
+                    "FooterCopyRight.$.section": copyrightData.section,
+                    "FooterCopyRight.$.copyrightText": copyrightData.copyrightText,
+                    "FooterCopyRight.$.poweredByText": copyrightData.poweredByText,
+                    "FooterCopyRight.$.paymentIcons": copyrightData.paymentIcons
+                }
+            },
+            { new: true }
+        );
+
+        if (footer) {
+            console.log("Updated existing copyright");
+        } else {
+            // If no existing copyright found, create new one
+            footer = await HeaderData.findByIdAndUpdate(
+                userId,
+                {
+                    $push: {
+                        FooterCopyRight: {
+                            _id: new mongoose.Types.ObjectId(),
+                            ...copyrightData
+                        }
+                    }
+                },
+                { new: true, upsert: true }
+            );
+            console.log("Created new copyright");
+        }
+
+        const updatedCopyright = footer.FooterCopyRight.find(item => item.section === 'copyright');
+
+        res.status(200).json({
+            success: true,
+            message: existingIndex !== -1 
+                ? "Footer copyright updated successfully" 
+                : "Footer copyright created successfully",
+            data: updatedCopyright
+        });
+
+    } catch (error) {
+        console.error("Error creating/updating footer copyright:", error);
+        res.status(500).json({
+            success: false,
+            message: "Error creating/updating footer copyright",
+            error: error.message
+        });
+    }
+};
+
+// Delete individual payment icon by ID
+const deleteIconById = async (req, res) => {
+    try {
+        const { userId, iconId } = req.params;
+
+        if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid User ID"
+            });
+        }
+
+        if (!iconId) {
+            return res.status(400).json({
+                success: false,
+                message: "Icon ID is required"
+            });
+        }
+
+        const footer = await HeaderData.findOneAndUpdate(
+            { 
+                _id: userId,
+                "FooterCopyRight.section": "copyright"
+            },
+            {
+                $pull: {
+                    "FooterCopyRight.$.paymentIcons": { id: parseInt(iconId) }
+                }
+            },
+            { new: true }
+        );
+
+        if (!footer) {
+            return res.status(404).json({
+                success: false,
+                message: "Footer copyright section not found"
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: `Icon ${iconId} deleted successfully`
+        });
+
+    } catch (error) {
+        console.error("Error deleting icon:", error);
+        res.status(500).json({
+            success: false,
+            message: "Error deleting icon",
+            error: error.message
+        });
+    }
+};
+
+// Delete multiple payment icons
+const deleteMultipleIcons = async (req, res) => {
+    try {
+        const { userId, footerId } = req.params;
+        const { iconIds } = req.body;
+
+        if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid User ID"
+            });
+        }
+
+        if (!iconIds || !Array.isArray(iconIds)) {
+            return res.status(400).json({
+                success: false,
+                message: "Icon IDs array is required"
+            });
+        }
+
+        const footer = await HeaderData.findOneAndUpdate(
+            { 
+                _id: userId,
+                "FooterCopyRight.section": "copyright"
+            },
+            {
+                $pull: {
+                    "FooterCopyRight.$.paymentIcons": { 
+                        id: { $in: iconIds.map(id => parseInt(id)) } 
+                    }
+                }
+            },
+            { new: true }
+        );
+
+        if (!footer) {
+            return res.status(404).json({
+                success: false,
+                message: "Footer copyright section not found"
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: `${iconIds.length} payment icon(s) deleted successfully`
+        });
+
+    } catch (error) {
+        console.error("Error deleting multiple icons:", error);
+        res.status(500).json({
+            success: false,
+            message: "Error deleting multiple icons",
+            error: error.message
+        });
+    }
+};
+
+// Delete entire footer copyright section
+const deleteEntireFooter = async (req, res) => {
+    try {
+        const { userId, footerId } = req.params;
+
+        if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid User ID"
+            });
+        }
+
+        if (!footerId || !mongoose.Types.ObjectId.isValid(footerId)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid Footer ID"
+            });
+        }
+
+        const footer = await HeaderData.findOneAndUpdate(
+            { 
+                _id: userId,
+                "FooterCopyRight._id": footerId
+            },
+            {
+                $pull: {
+                    FooterCopyRight: { _id: footerId }
+                }
+            },
+            { new: true }
+        );
+
+        if (!footer) {
+            return res.status(404).json({
+                success: false,
+                message: "Footer copyright section not found"
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Footer copyright section deleted successfully"
+        });
+
+    } catch (error) {
+        console.error("Error deleting footer copyright section:", error);
+        res.status(500).json({
+            success: false,
+            message: "Error deleting footer copyright section",
+            error: error.message
+        });
+    }
+};
+
 module.exports = {
     updateFooterSponsorsById,
     getFooterSponsor,
@@ -1424,5 +1722,10 @@ module.exports = {
     createFooterTopBar,
     getFooterTopBar,
     getFooterHelpCenterForm,
-    getAllFooterData
+    getAllFooterData,
+    getFooterCopyRight,
+    createUpdateFooterCopyRight,
+    deleteIconById,
+    deleteMultipleIcons,
+    deleteEntireFooter
 };

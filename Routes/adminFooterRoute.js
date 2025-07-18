@@ -25,7 +25,12 @@ const {
     createFooterTopBar,
     getFooterTopBar,
     getFooterHelpCenterForm,
-    getAllFooterData
+    getAllFooterData,
+    getFooterCopyRight,
+    createUpdateFooterCopyRight,
+    deleteIconById,
+    deleteMultipleIcons,
+    deleteEntireFooter
 } = require("../Controller/adminFooterController");
 const { upload, siteupload } = require("../Middleware/FileStorage");
 
@@ -105,6 +110,15 @@ footerRoute.get("/footer-help-center-form/:userId", getFooterHelpCenterForm);
 
 // Footer All Data routes
 footerRoute.get("/footer-all-data/:userId", getAllFooterData);
+
+// Footer Copyright routes
+footerRoute.get("/api-get-footer-data/:userId", getFooterCopyRight);
+footerRoute.put("/api-create-update-footer/:userId", createUpdateFooterCopyRight);
+
+// Footer Copyright Delete routes
+footerRoute.delete("/api-delete-icon-by-id/:userId/:iconId", deleteIconById);
+footerRoute.delete("/api-delete-footer-icons/:userId/:footerId", deleteMultipleIcons);
+footerRoute.delete("/api-delete-footer/:userId/:footerId", deleteEntireFooter);
 
 module.exports = {
     footerRoute

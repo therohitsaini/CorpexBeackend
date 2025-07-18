@@ -19,6 +19,18 @@ const headerSchema = new mongoose.Schema({
             ]
         }
     ],
+    SectionHeadingTop: [
+        {
+            section: { type: String, required: true },
+            item: [
+                {
+                    item_Title: { type: String },
+                    item_Description: { type: String },
+                    item_ShowOnWebsite: { type: Boolean }
+                }
+            ]
+        }
+    ],
 
     inFoData: [
 
@@ -51,6 +63,15 @@ const headerSchema = new mongoose.Schema({
             serviceHeading: { type: String },
             ServiceDescription: { type: String },
             iconeBottom: { type: String }
+        }
+    ],
+
+    ServiceHeadingSection: [
+        {
+            _id: { type: mongoose.Schema.Types.ObjectId, auto: true },
+            heading: { type: String },
+            description: { type: String },
+            showOnWebsite: { type: Boolean, default: true }
         }
     ],
 
@@ -254,7 +275,25 @@ const headerSchema = new mongoose.Schema({
             icone: { type: String },
             image: { type: String }
         }
-    }
+    },
+
+    FooterCopyRight: [
+        {
+            _id: { type: mongoose.Schema.Types.ObjectId, auto: true },
+            section: { type: String, },
+            copyrightText: { type: String, },
+            poweredByText: { type: String, },
+            paymentIcons: [
+                {
+                    id: { type: Number },
+                    name: { type: String },
+                    icon: { type: String },
+                    url: { type: String },
+                    isActive: { type: Boolean, default: true }
+                }
+            ]
+        }
+    ]
 
 
 
