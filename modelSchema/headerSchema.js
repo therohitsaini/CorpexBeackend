@@ -14,7 +14,7 @@ const headerSchema = new mongoose.Schema({
                     item_ContactId: { type: String },
                     item_Icone: { type: String },
                     item_IconeUrl: { type: String },
-                    item_ShowOnWebsite: { type: Boolean }
+                    item_ShowOnWebsite: { type: String }
                 }
             ]
         }
