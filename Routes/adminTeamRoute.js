@@ -11,9 +11,9 @@ teamRoute.put('/api-team/create-update/:id', siteupload.single('teamBgImage'), u
 teamRoute.put('/api-team/create-update/:id/:sectionId', siteupload.single('teamBgImage'), updateAndCreateTeamStore);
 teamRoute.get("/api-get/team-heading/:id", getTeamHeading)
 teamRoute.post("/api-post-team/:id", siteupload.single("image"), postTeamInformation)
-teamRoute.put("/api-update-team/:docsId", siteupload.single("image"), updateTeamMember)
+teamRoute.put("/api-update-team/:id/:docsId", siteupload.single("image"), updateTeamMember)
 teamRoute.get("/api-get-team-card/:id", getTeamCard)
-teamRoute.delete("/api-delete-team-card/",deleteTeamCardData)
+teamRoute.delete("/api-delete-team-card/", deleteTeamCardData)
 
 
 module.exports = {

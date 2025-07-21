@@ -5,7 +5,7 @@ const { ObjectId } = mongoose.Types;
 const postPortfolioSection = async (request, response) => {
     const { id } = request.params;
     const body = request.body;
-  
+
 
     try {
 
@@ -107,16 +107,17 @@ const deletePortData = async (request, response) => {
 
 // updateDOCS
 const updatePortfoliorData = async (req, res) => {
-    const { userId, userDocID } = req.params;
+    const { id, userDocID } = req.params;
+    console.log(id)
 
-    if (!userId || !userDocID) {
+    if (!id || !userDocID) {
         return res.status(400).send({ message: "Id Not found" })
     }
 
     try {
-        const userObjectId = new mongoose.Types.ObjectId(userId);
+        const userObjectId = new mongoose.Types.ObjectId(id);
         const userDocsObjectId = new mongoose.Types.ObjectId(userDocID);
-       
+
         const updateFields = {
             "portfolioItems.$.title": req.body.title || "",
             "portfolioItems.$.subTitle": req.body.subTitle || "",
@@ -130,7 +131,7 @@ const updatePortfoliorData = async (req, res) => {
 
         if (req.file) {
             updateFields["portfolioItems.$.userImage"] =
-                `/uploadsStore/${req.params.userId}/${req.file.filename}`;
+                `/uploadsStore/${req.params.id}/${req.file.filename}`;
 
         }
 

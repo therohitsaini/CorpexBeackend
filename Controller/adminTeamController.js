@@ -191,7 +191,7 @@ const deleteTeamCardData = async (request, response) => {
 }
 
 const updateTeamMember = async (request, response) => {
-    const { docsId } = request.params;
+    const { id, docsId } = request.params;
     const { name, role } = request.body;
 
     try {
@@ -230,7 +230,7 @@ const updateTeamMember = async (request, response) => {
 
         // Handle image update if a new image is uploaded
         if (request.file) {
-            updateData.image = `/uploadsStore/${userData._id}/${request.file.filename}`;
+            updateData.image = `/uploadsStore/${id}/${request.file.filename}`;
         } else {
             // Keep the existing image path
             updateData.image = userData.TeamCardSection[teamMemberIndex].image || "";
@@ -246,14 +246,14 @@ const updateTeamMember = async (request, response) => {
 
         return response.status(200).json({
             message: "Team member updated successfully.",
-            data: userData.TeamCardSection[teamMemberIndex]
+            // data: userData.TeamCardSection[teamMemberIndex]
         });
 
     } catch (error) {
         console.error("Error updating team member:", error);
-        return response.status(500).json({ 
+        return response.status(500).json({
             message: "Internal server error.",
-            error: error.message 
+            error: error.message
         });
     }
 }

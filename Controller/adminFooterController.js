@@ -78,6 +78,8 @@ const getFooterSponsor = async (req, res) => {
 const updateFooterBackground = async (req, res) => {
     try {
         const { id } = req.params;
+        const body = req.body
+        console.log("body____", body)
 
         if (!id || !mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({ message: "Invalid ID" });
@@ -96,10 +98,20 @@ const updateFooterBackground = async (req, res) => {
         }
 
         // Update footer background data
+        // const updateData = {
+
+        //     backgroundColor: req.body.backgroundColor || footer.FooterBackground?.backgroundColor || "",
+        //     backgroundImage: backgroundImagePath || footer.FooterBackground?.backgroundImage || ""
+        // };
         const updateData = {
-            backgroundColor: req.body.backgroundColor || footer.FooterBackground?.backgroundColor || "",
+            backgroundColor:
+                "backgroundColor" in req.body
+                    ? req.body.backgroundColor
+                    : footer.FooterBackground?.backgroundColor || "",
+
             backgroundImage: backgroundImagePath || footer.FooterBackground?.backgroundImage || ""
         };
+
 
         // Update the document
         const updatedFooter = await HeaderData.findByIdAndUpdate(
@@ -1116,16 +1128,16 @@ const getFooterSponsors = async (req, res) => {
             Image_five: ""
         };
 
-        res.status(200).json({ 
-            success: true, 
-            data: sponsorsData 
+        res.status(200).json({
+            success: true,
+            data: sponsorsData
         });
 
     } catch (error) {
         console.error("Error getting footer sponsors:", error);
-        res.status(500).json({ 
-            message: "Error getting footer sponsors", 
-            error: error.message 
+        res.status(500).json({
+            message: "Error getting footer sponsors",
+            error: error.message
         });
     }
 };
@@ -1194,16 +1206,16 @@ const updateFooterSponsors = async (req, res) => {
             Image_five: fixPath(footer.FooterSponese[0].sponsorsFive)
         };
 
-        res.status(200).json({ 
-            message: "Footer sponsors updated successfully", 
-            data: responseData 
+        res.status(200).json({
+            message: "Footer sponsors updated successfully",
+            data: responseData
         });
 
     } catch (error) {
         console.error("Error updating footer sponsors:", error);
-        res.status(500).json({ 
-            message: "Error updating footer sponsors", 
-            error: error.message 
+        res.status(500).json({
+            message: "Error updating footer sponsors",
+            error: error.message
         });
     }
 };
@@ -1257,16 +1269,16 @@ const createFooterSponsors = async (req, res) => {
             Image_five: fixPath(newSponsorData.sponsorsFive)
         };
 
-        res.status(201).json({ 
-            message: "Footer sponsors created successfully", 
-            data: responseData 
+        res.status(201).json({
+            message: "Footer sponsors created successfully",
+            data: responseData
         });
 
     } catch (error) {
         console.error("Error creating footer sponsors:", error);
-        res.status(500).json({ 
-            message: "Error creating footer sponsors", 
-            error: error.message 
+        res.status(500).json({
+            message: "Error creating footer sponsors",
+            error: error.message
         });
     }
 };
@@ -1324,16 +1336,16 @@ const createFooterTopBar = async (req, res) => {
             }
         };
 
-        res.status(200).json({ 
-            message: "Footer top bar updated successfully", 
-            data: responseData 
+        res.status(200).json({
+            message: "Footer top bar updated successfully",
+            data: responseData
         });
 
     } catch (error) {
         console.error("Error updating footer top bar:", error);
-        res.status(500).json({ 
-            message: "Error updating footer top bar", 
-            error: error.message 
+        res.status(500).json({
+            message: "Error updating footer top bar",
+            error: error.message
         });
     }
 };
@@ -1383,16 +1395,16 @@ const getFooterTopBar = async (req, res) => {
             }
         };
 
-        res.status(200).json({ 
-            success: true, 
-            data: footerTopBar 
+        res.status(200).json({
+            success: true,
+            data: footerTopBar
         });
 
     } catch (error) {
         console.error("Error getting footer top bar:", error);
-        res.status(500).json({ 
-            message: "Error getting footer top bar", 
-            error: error.message 
+        res.status(500).json({
+            message: "Error getting footer top bar",
+            error: error.message
         });
     }
 };
@@ -1420,8 +1432,8 @@ const getFooterCopyRight = async (req, res) => {
         }
 
         // Return the first copyright entry or create default structure
-        const copyrightData = footer.FooterCopyRight && footer.FooterCopyRight.length > 0 
-            ? footer.FooterCopyRight[0] 
+        const copyrightData = footer.FooterCopyRight && footer.FooterCopyRight.length > 0
+            ? footer.FooterCopyRight[0]
             : {
                 section: 'copyright',
                 copyrightText: 'Copyright © 2023 Corpex | Powered By Corpex',
@@ -1477,7 +1489,7 @@ const createUpdateFooterCopyRight = async (req, res) => {
 
         // Try to update existing copyright first
         let footer = await HeaderData.findOneAndUpdate(
-            { 
+            {
                 _id: userId,
                 "FooterCopyRight.section": "copyright"
             },
@@ -1515,8 +1527,8 @@ const createUpdateFooterCopyRight = async (req, res) => {
 
         res.status(200).json({
             success: true,
-            message: existingIndex !== -1 
-                ? "Footer copyright updated successfully" 
+            message: existingIndex !== -1
+                ? "Footer copyright updated successfully"
                 : "Footer copyright created successfully",
             data: updatedCopyright
         });
@@ -1551,7 +1563,7 @@ const deleteIconById = async (req, res) => {
         }
 
         const footer = await HeaderData.findOneAndUpdate(
-            { 
+            {
                 _id: userId,
                 "FooterCopyRight.section": "copyright"
             },
@@ -1606,14 +1618,14 @@ const deleteMultipleIcons = async (req, res) => {
         }
 
         const footer = await HeaderData.findOneAndUpdate(
-            { 
+            {
                 _id: userId,
                 "FooterCopyRight.section": "copyright"
             },
             {
                 $pull: {
-                    "FooterCopyRight.$.paymentIcons": { 
-                        id: { $in: iconIds.map(id => parseInt(id)) } 
+                    "FooterCopyRight.$.paymentIcons": {
+                        id: { $in: iconIds.map(id => parseInt(id)) }
                     }
                 }
             },
@@ -1662,7 +1674,7 @@ const deleteEntireFooter = async (req, res) => {
         }
 
         const footer = await HeaderData.findOneAndUpdate(
-            { 
+            {
                 _id: userId,
                 "FooterCopyRight._id": footerId
             },
