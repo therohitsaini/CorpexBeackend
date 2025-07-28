@@ -24,6 +24,7 @@ const { blogRoute } = require("./Routes/adminBlogRoute")
 const { footerRoute } = require("./Routes/adminFooterRoute")
 const { headingTopRoutes } = require("./Routes/adminHeadingsRoute")
 
+
 app.use(express.json())
 app.use(express.static(path_.join(__dirname, "uploads")))
 app.use('/uploadsStore', express.static(path_.join(__dirname, 'uploadsStore')));
@@ -47,6 +48,7 @@ app.use("/api-blog", blogRoute)
 app.use("/api-footer", footerRoute)
 app.use("/api", footerRoute)
 app.use("/api-heading", headingTopRoutes)
+
 
 
 

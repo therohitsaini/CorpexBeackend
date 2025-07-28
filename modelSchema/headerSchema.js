@@ -293,7 +293,13 @@ const headerSchema = new mongoose.Schema({
                 }
             ]
         }
-    ]
+    ],
+
+    BreadCrumb: {
+        breadCrumbImage: { type: String },
+        BreadCrumbIcone: { type: String },
+        item_ShowOnWebsite: { type: Boolean, default: false }
+    }
 
 
 
